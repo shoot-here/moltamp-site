@@ -1,0 +1,170 @@
+---
+const skins = [
+  {
+    name: 'Default',
+    description: 'Clean dark theme. No frills, all function.',
+    colors: ['#08080a', '#4d9fff', '#f0f0f2', '#222228'],
+  },
+  {
+    name: 'Cyberdeck',
+    description: 'Neon green on black. Scanlines. Maximum hacker.',
+    colors: ['#0a0f0a', '#00ff88', '#e0ffe0', '#1a2f1a'],
+  },
+  {
+    name: 'Sakura',
+    description: 'Soft pink pastels with cherry blossom vibes.',
+    colors: ['#1a0f14', '#ff6b9d', '#fff0f5', '#2a1520'],
+  },
+  {
+    name: 'Amber',
+    description: 'Warm amber CRT. Retro phosphor terminal.',
+    colors: ['#0a0800', '#ffb347', '#ffe8c0', '#1f1a0a'],
+  },
+];
+---
+
+<section id="skins" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Skins</span>
+      <h2>Make it yours</h2>
+      <p>Every skin is a folder with a JSON manifest and a CSS theme. Build one in minutes, share it with everyone.</p>
+    </div>
+
+    <div class="skins-grid">
+      {skins.map((skin) => (
+        <div class="skin-card card">
+          <div class="skin-preview" style={`background: ${skin.colors[0]};`}>
+            <div class="skin-mockup">
+              <div class="sm-bar" style={`background: ${skin.colors[3]};`}>
+                <span class="sm-dot" style={`background: ${skin.colors[1]};`}></span>
+                <span class="sm-dot" style={`background: ${skin.colors[1]}; opacity: 0.5;`}></span>
+                <span class="sm-dot" style={`background: ${skin.colors[1]}; opacity: 0.3;`}></span>
+              </div>
+              <div class="sm-body">
+                <div class="sm-line" style={`color: ${skin.colors[1]};`}>&gt; _</div>
+                <div class="sm-line" style={`color: ${skin.colors[2]}; opacity: 0.4;`}>ready</div>
+              </div>
+            </div>
+          </div>
+          <div class="skin-info">
+            <div class="skin-name-row">
+              <h3>{skin.name}</h3>
+              <div class="skin-colors">
+                {skin.colors.map((c) => (
+                  <span class="color-dot" style={`background: ${c};`}></span>
+                ))}
+              </div>
+            </div>
+            <p>{skin.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="skins-cta">
+      <p>Or build your own — it's just CSS + JSON.</p>
+      <a href="https://github.com/shoot-here/moltamp/blob/main/skins/SKINNING.md" class="btn btn-secondary" target="_blank" rel="noopener">
+        Skinning Guide
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .skins-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .skin-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .skin-preview {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skin-mockup {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .sm-bar {
+    display: flex;
+    gap: 5px;
+    padding: 6px 10px;
+  }
+
+  .sm-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .sm-body {
+    padding: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.8;
+  }
+
+  .skin-info {
+    padding: 16px 20px;
+  }
+
+  .skin-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .skin-name-row h3 {
+    font-size: 0.95rem;
+  }
+
+  .skin-colors {
+    display: flex;
+    gap: 4px;
+  }
+
+  .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .skin-info p {
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+  }
+
+  .skins-cta {
+    text-align: center;
+    margin-top: 48px;
+  }
+
+  .skins-cta p {
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 900px) {
+    .skins-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .skins-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

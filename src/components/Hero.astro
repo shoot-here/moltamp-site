@@ -1,0 +1,260 @@
+---
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <span class="badge">
+        <span class="badge-dot"></span>
+        Now in public beta
+      </span>
+
+      <h1>
+        Your AI terminal<br />
+        deserves a <span class="gradient-text">cockpit</span>.
+      </h1>
+
+      <p class="hero-sub">
+        Moltamp wraps Claude Code in a fully skinnable shell with panels, widgets,
+        music, and Live2D companions. Think Winamp for AI terminals.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#pricing" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download for Mac
+        </a>
+        <a href="https://github.com/shoot-here/moltamp" class="btn btn-secondary" target="_blank" rel="noopener">
+          View on GitHub
+        </a>
+      </div>
+
+      <p class="hero-note">Free forever. $10 to remove the nag and support development.</p>
+    </div>
+
+    <div class="hero-screenshot">
+      <div class="glow-border">
+        <div class="screenshot-placeholder">
+          <div class="placeholder-chrome">
+            <div class="ph-dot"></div>
+            <div class="ph-dot"></div>
+            <div class="ph-dot"></div>
+            <span class="ph-title">moltamp</span>
+          </div>
+          <div class="placeholder-body">
+            <div class="ph-sidebar">
+              <div class="ph-block" style="height: 40px; opacity: 0.3;"></div>
+              <div class="ph-block" style="height: 60px; opacity: 0.2;"></div>
+              <div class="ph-block" style="height: 40px; opacity: 0.15;"></div>
+            </div>
+            <div class="ph-terminal">
+              <div class="ph-line"><span class="ph-prompt">&gt;</span> claude --skin cyberdeck</div>
+              <div class="ph-line ph-dim">Loading skin: Cyberdeck v2.1</div>
+              <div class="ph-line ph-dim">Panels: intel, signal, telemetry</div>
+              <div class="ph-line ph-dim">Widgets: music, companion, ticker</div>
+              <div class="ph-line"><span class="ph-cursor">_</span></div>
+            </div>
+            <div class="ph-sidebar-right">
+              <div class="ph-block" style="height: 80px; opacity: 0.25;"></div>
+              <div class="ph-block" style="height: 50px; opacity: 0.2;"></div>
+            </div>
+          </div>
+          <div class="placeholder-status">
+            <span>cyberdeck</span>
+            <span>~/projects</span>
+            <span>opus 4.6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: calc(var(--nav-height) + 80px) 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 600px;
+    background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent), var(--accent-warm));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    max-width: 580px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-note {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  /* Screenshot placeholder */
+  .hero-screenshot {
+    margin-top: 64px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .screenshot-placeholder {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .placeholder-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ph-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-hover);
+  }
+
+  .ph-title {
+    margin-left: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .placeholder-body {
+    display: grid;
+    grid-template-columns: 160px 1fr 140px;
+    min-height: 340px;
+    gap: 0;
+  }
+
+  .ph-sidebar, .ph-sidebar-right {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-right: 1px solid var(--border);
+  }
+
+  .ph-sidebar-right {
+    border-right: none;
+    border-left: 1px solid var(--border);
+  }
+
+  .ph-block {
+    background: var(--accent);
+    border-radius: var(--radius-sm);
+  }
+
+  .ph-terminal {
+    padding: 24px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 2;
+  }
+
+  .ph-line {
+    color: var(--text-primary);
+  }
+
+  .ph-dim {
+    color: var(--text-dim);
+  }
+
+  .ph-prompt {
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  .ph-cursor {
+    color: var(--accent);
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .placeholder-status {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .placeholder-body {
+      grid-template-columns: 1fr;
+    }
+
+    .ph-sidebar, .ph-sidebar-right {
+      display: none;
+    }
+  }
+</style>

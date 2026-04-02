@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Unlock Moltamp — $10 Lifetime License">
+  <Nav />
+  <main class="buy-page">
+    <div class="container">
+      <div class="buy-card card">
+        <h1>Unlock Moltamp</h1>
+        <p class="buy-desc">
+          One payment. Lifetime license. The nag popup disappears forever.
+        </p>
+
+        <div class="buy-price">
+          <span class="price">$10</span>
+          <span class="price-label">one-time payment</span>
+        </div>
+
+        <div class="buy-includes">
+          <h3>What you get:</h3>
+          <ul>
+            <li>License key emailed instantly</li>
+            <li>No nag popup — ever again</li>
+            <li>Works offline after first activation</li>
+            <li>30-day refund guarantee</li>
+          </ul>
+        </div>
+
+        <form id="checkout-form" class="buy-form">
+          <label for="email">Email address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+          />
+          <button type="submit" class="btn btn-primary buy-btn" id="checkout-btn">
+            Pay $10 — Get License Key
+          </button>
+          <p class="buy-secure">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Secure payment via Stripe. We never see your card details.
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('checkout-form') as HTMLFormElement;
+  const btn = document.getElementById('checkout-btn') as HTMLButtonElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to Stripe...';
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Pay $10 — Get License Key';
+      alert('Something went wrong. Please try again.');
+      console.error(err);
+    }
+  });
+</script>
+
+<style>
+  .buy-page {
+    padding: calc(var(--nav-height) + 80px) 0 120px;
+    min-height: 100vh;
+  }
+
+  .buy-card {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px 40px;
+  }
+
+  .buy-card h1 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .buy-desc {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+  }
+
+  .buy-price {
+    margin-bottom: 32px;
+  }
+
+  .buy-price .price {
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  .price-label {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  .buy-includes {
+    text-align: left;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+  }
+
+  .buy-includes h3 {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  .buy-includes ul {
+    list-style: none;
+  }
+
+  .buy-includes li {
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .buy-includes li::before {
+    content: '✓ ';
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .buy-form {
+    text-align: left;
+  }
+
+  .buy-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .buy-form input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .buy-form input:focus {
+    border-color: var(--accent);
+  }
+
+  .buy-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+  .buy-secure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+</style>

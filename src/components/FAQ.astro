@@ -1,0 +1,109 @@
+---
+const faqs = [
+  {
+    q: 'What exactly is Moltamp?',
+    a: 'An Electron app that wraps Claude Code\'s terminal in a skinnable UI with panels, widgets, and a music player. It spawns Claude Code as a child process — your actual Claude Code setup, config, and CLAUDE.md files are all untouched.',
+  },
+  {
+    q: 'Does it replace Claude Code?',
+    a: 'No. Moltamp runs Claude Code inside it. You still get the full CLI experience — same model, same tools, same everything. Moltamp adds the chrome around it.',
+  },
+  {
+    q: 'What\'s in the free version vs. the paid?',
+    a: 'They\'re identical. Every feature works in both. The only difference is a periodic popup in the free version asking you to support the project. $10 removes it forever.',
+  },
+  {
+    q: 'How does the license key work?',
+    a: 'After payment, you receive a license key by email. Paste it into Moltamp\'s settings. The app validates it once online, then it works offline forever.',
+  },
+  {
+    q: 'Can I make my own skins?',
+    a: 'Yes. A skin is a folder with a JSON manifest and a CSS theme file. The skinning guide covers everything. There are no restrictions on what you can customize.',
+  },
+  {
+    q: 'What platforms are supported?',
+    a: 'macOS right now. Windows and Linux builds are planned. The codebase is Electron so it\'s mostly a matter of testing and packaging.',
+  },
+  {
+    q: 'Is my data sent anywhere?',
+    a: 'No. Moltamp runs entirely locally. The only network call is license key validation, which sends just the key and email — nothing else. All telemetry stays on your machine.',
+  },
+  {
+    q: 'Can I get a refund?',
+    a: 'Yes, within 30 days, no questions asked. Email refunds@moltamp.com and we\'ll process it immediately.',
+  },
+];
+---
+
+<section id="faq" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">FAQ</span>
+      <h2>Questions</h2>
+    </div>
+
+    <div class="faq-list">
+      {faqs.map((faq) => (
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>{faq.q}</span>
+            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </summary>
+          <p class="faq-answer">{faq.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-list {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    list-style: none;
+    color: var(--text-primary);
+    transition: color var(--transition-fast);
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-question:hover {
+    color: var(--accent);
+  }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    color: var(--text-dim);
+    transition: transform var(--transition-base);
+  }
+
+  details[open] .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    padding: 0 0 20px;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    max-width: 600px;
+  }
+</style>

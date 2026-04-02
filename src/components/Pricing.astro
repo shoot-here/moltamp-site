@@ -1,0 +1,150 @@
+---
+---
+
+<section id="pricing" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">Pricing</span>
+      <h2>One price. No tricks.</h2>
+    </div>
+
+    <div class="pricing-cards">
+      <div class="card pricing-card">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-amount">
+          <span class="price">$0</span>
+          <span class="price-period">forever</span>
+        </div>
+        <p class="pricing-desc">Full app. All features. Occasional popup.</p>
+        <ul class="pricing-features">
+          <li>All skins and themes</li>
+          <li>All panels and widgets</li>
+          <li>Music player + visualizer</li>
+          <li>Live2D companions</li>
+          <li>Real-time telemetry</li>
+          <li>Hook event stream</li>
+          <li>Community skin gallery</li>
+        </ul>
+        <a href="#" class="btn btn-secondary pricing-btn">Download .dmg</a>
+      </div>
+
+      <div class="card pricing-card pricing-card-highlight">
+        <div class="pricing-popular">Support the project</div>
+        <div class="pricing-tier">Unlocked</div>
+        <div class="pricing-amount">
+          <span class="price">$10</span>
+          <span class="price-period">one time</span>
+        </div>
+        <p class="pricing-desc">Same app. No popup. Lifetime license.</p>
+        <ul class="pricing-features">
+          <li>Everything in Free</li>
+          <li>No nag popup — ever</li>
+          <li>License key via email</li>
+          <li>Warm fuzzy feeling</li>
+        </ul>
+        <a href="/buy" class="btn btn-primary pricing-btn">Unlock for $10</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .pricing-card {
+    text-align: center;
+    padding: 40px 32px;
+    position: relative;
+  }
+
+  .pricing-card-highlight {
+    border-color: var(--accent-glow);
+    background: linear-gradient(to bottom, var(--accent-subtle), var(--bg-card));
+    box-shadow: 0 0 40px var(--accent-glow);
+  }
+
+  .pricing-popular {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 16px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .pricing-tier {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .pricing-amount {
+    margin-bottom: 12px;
+  }
+
+  .price {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  .price-period {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .pricing-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+
+  .pricing-features {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+
+  .pricing-features li {
+    padding: 8px 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pricing-features li:last-child {
+    border-bottom: none;
+  }
+
+  .pricing-features li::before {
+    content: '✓ ';
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .pricing-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (max-width: 600px) {
+    .pricing-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

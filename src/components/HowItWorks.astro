@@ -1,0 +1,119 @@
+---
+const steps = [
+  {
+    number: '01',
+    title: 'Download',
+    description: 'Grab the .dmg from this page or build from source. Moltamp installs alongside your existing Claude Code setup.',
+    detail: 'macOS only for now. Windows + Linux coming.',
+  },
+  {
+    number: '02',
+    title: 'Use it free',
+    description: 'Everything works. All skins, all panels, all widgets. You get an occasional popup asking you to support the project.',
+    detail: 'No feature gates. No time limits. Full app.',
+  },
+  {
+    number: '03',
+    title: 'Unlock for $10',
+    description: 'One payment, lifetime license. The popup goes away forever. You get a license key tied to your email.',
+    detail: 'That\'s it. No subscriptions. No upsells.',
+  },
+];
+---
+
+<section class="section how-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="badge">How it works</span>
+      <h2>Free forever. Pay if you want.</h2>
+      <p>Moltamp is freeware. Every feature works out of the box. The $10 unlock just removes the nag screen and supports development.</p>
+    </div>
+
+    <div class="steps">
+      {steps.map((step, i) => (
+        <div class="step">
+          <div class="step-number">{step.number}</div>
+          <div class="step-content">
+            <h3>{step.title}</h3>
+            <p>{step.description}</p>
+            <span class="step-detail">{step.detail}</span>
+          </div>
+          {i < steps.length - 1 && <div class="step-connector"></div>}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-section {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    position: relative;
+    padding-bottom: 48px;
+  }
+
+  .step:last-child {
+    padding-bottom: 0;
+  }
+
+  .step-number {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-subtle);
+    border: 1px solid var(--accent-glow);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-connector {
+    position: absolute;
+    left: 21px;
+    top: 44px;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent-glow), transparent);
+  }
+
+  .step-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+
+  .step-content p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .step-detail {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+</style>
