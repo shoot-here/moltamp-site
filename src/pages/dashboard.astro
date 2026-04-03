@@ -706,21 +706,28 @@ import Footer from '../components/Footer.astro';
   .sk-card {
     display: flex;
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     overflow: hidden;
     transition: border-color 0.15s;
   }
 
   .sk-card:hover { border-color: var(--border-hover); }
 
-  .sk-accent {
-    width: 4px;
+  .sk-thumb {
+    width: 100px;
     flex-shrink: 0;
+    display: block;
+    border-right: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .sk-thumb .mini-terminal {
+    aspect-ratio: 1 / 1;
   }
 
   .sk-body {
     flex: 1;
     padding: 12px 16px;
+    min-width: 0;
   }
 
   .sk-top {
