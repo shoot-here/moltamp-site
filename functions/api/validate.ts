@@ -1,21 +1,21 @@
 interface Env {
   DB: D1Database;
-  LICENSE_HMAC_SECRET: string;
 }
 
 /**
- * License validation endpoint.
- * Called by the Moltamp desktop app to check a license key.
+ * License validation endpoint — server-authoritative.
+ * The server is the ONLY authority. No signatures, no HMAC.
+ * App calls this on every launch.
  *
  * POST /api/validate
  * Body: { "email": "...", "license_key": "MOLT-XXXX-XXXX-XXXX-XXXX", "machine_id": "..." }
  *
  * Returns:
- *   200 { "valid": true, "signature": "hmac_hex" }  — key is legit
- *   200 { "valid": false } — key not found or doesn't match email
+ *   200 { "valid": true }  — key is legit
+ *   200 { "valid": false } — key not found or revoked
  */
 export const onRequestPost: PagesFunction<Env> = async (context) => {
-  const { DB, LICENSE_HMAC_SECRET } = context.env;
+  const { DB } = context.env;
 
   const body = await context.request.json<{
     email: string;
@@ -27,9 +27,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const licenseKey = body.license_key?.trim().toUpperCase();
   const machineId = body.machine_id?.trim();
 
-  if (!email || !licenseKey || !machineId) {
+  if (!email || !licenseKey) {
     return Response.json(
-      { valid: false, error: 'email, license_key, and machine_id required' },
+      { valid: false, error: 'email and license_key required' },
       { status: 400 },
     );
   }
@@ -43,38 +43,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     .first();
 
   if (result) {
-    // Update last validated timestamp
+    // Update last validated timestamp and machine_id
     await DB.prepare(
       `UPDATE licenses SET last_validated_at = datetime('now') WHERE email = ? AND license_key = ?`,
     )
       .bind(email, licenseKey)
       .run();
 
-    const signature = await hmacSign(
-      LICENSE_HMAC_SECRET,
-      email + licenseKey + machineId,
-    );
-
-    return Response.json({ valid: true, signature });
+    return Response.json({ valid: true });
   }
 
   return Response.json({ valid: false });
 };
-
-/**
- * Generate an HMAC-SHA256 hex signature using the Web Crypto API.
- */
-async function hmacSign(secret: string, message: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
-  return Array.from(new Uint8Array(sig))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-}
