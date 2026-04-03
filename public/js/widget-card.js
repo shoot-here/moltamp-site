@@ -24,8 +24,15 @@ function renderWidgetCard(widget) {
   const size = (widget.file_size / 1024).toFixed(0);
 
   return '<a href="/widgets/view?id=' + widget.widget_id + '" class="widget-card">' +
-    '<div class="wc-icon">' +
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>' +
+    '<div class="wc-preview">' +
+      '<iframe src="/api/widgets/' + widget.widget_id + '/preview" ' +
+        'sandbox="allow-scripts" ' +
+        'loading="lazy" ' +
+        'tabindex="-1" ' +
+        'title="' + widget.name + ' preview" ' +
+        'class="wc-preview-iframe">' +
+      '</iframe>' +
+      '<div class="wc-preview-overlay"></div>' +
     '</div>' +
     '<div class="wc-body">' +
       '<h3 class="wc-name">' + widget.name + '</h3>' +

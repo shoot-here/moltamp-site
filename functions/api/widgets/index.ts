@@ -216,6 +216,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return jsonError(`Widget ID "${manifest.id}" is already taken`);
     }
 
+    // Extract index.html content for live iframe preview
+    const htmlContent = new TextDecoder().decode(indexHtmlBytes);
+
     // Store file data as blob in D1
     const fileBytes = new Uint8Array(buffer);
 
@@ -231,11 +234,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       await DB.prepare(
         `UPDATE community_widgets
          SET name = ?, version = ?, description = ?, author_name = ?,
-             r2_key = ?, file_size = ?, file_data = ?, updated_at = datetime('now')
+             r2_key = ?, file_size = ?, file_data = ?, html_content = ?, updated_at = datetime('now')
          WHERE widget_id = ?`,
       ).bind(
         manifest.name, manifest.version, manifest.description, manifest.author,
-        `d1://${manifest.id}`, file.size, fileBytes, manifest.id,
+        `d1://${manifest.id}`, file.size, fileBytes, htmlContent, manifest.id,
       ).run();
 
       const row = await DB.prepare(
@@ -250,12 +253,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } else {
       const insertResult = await DB.prepare(
         `INSERT INTO community_widgets
-           (widget_id, user_id, name, version, description, author_name, r2_key, file_size, file_data)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           (widget_id, user_id, name, version, description, author_name, r2_key, file_size, file_data, html_content)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).bind(
         manifest.id, user.id, manifest.name, manifest.version,
         manifest.description, manifest.author,
-        `d1://${manifest.id}`, file.size, fileBytes,
+        `d1://${manifest.id}`, file.size, fileBytes, htmlContent,
       ).run();
 
       const newId = insertResult.meta.last_row_id;
