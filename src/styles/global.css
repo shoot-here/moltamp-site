@@ -46,6 +46,7 @@
 
   /* Fonts */
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Syne', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
   /* Transitions */

@@ -6,7 +6,8 @@ interface Env {
 
 /**
  * GET /api/authors/:displayName
- * Public — author stats.
+ * Public — author stats. Looks up by author_name in community_skins
+ * (the name from the skin manifest), not users.display_name.
  */
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const displayName = decodeURIComponent(
@@ -15,16 +16,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { DB } = context.env;
 
   const author = await DB.prepare(
-    `SELECT u.id, u.display_name, u.created_at,
+    `SELECT cs.author_name as display_name,
+            MIN(u.created_at) as created_at,
             COUNT(cs.id) as skin_count,
             COALESCE(SUM(cs.download_count), 0) as total_downloads
-     FROM users u
-     LEFT JOIN community_skins cs ON cs.user_id = u.id AND cs.status = 'active'
-     WHERE u.display_name = ?
-     GROUP BY u.id
+     FROM community_skins cs
+     LEFT JOIN users u ON cs.user_id = u.id
+     WHERE cs.author_name = ? AND cs.status = 'active'
+     GROUP BY cs.author_name
      LIMIT 1`,
   ).bind(displayName).first<{
-    id: number;
     display_name: string;
     created_at: string;
     skin_count: number;

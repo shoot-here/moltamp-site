@@ -1,39 +1,93 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 ---
 
-<BaseLayout title="Login — MOLTamp Community">
+<BaseLayout title="Sign In — MOLTamp Community">
   <Nav />
-  <main class="login-page">
-    <div class="container">
-      <div class="login-card card">
-        <h1>Community Login</h1>
-        <p class="login-desc">Sign in with your license email and key to upload and share skins.</p>
+  <main class="login-scene">
+    <!-- Atmospheric background -->
+    <div class="scene-bg" aria-hidden="true">
+      <div class="scene-glow"></div>
+      <div class="scene-glow scene-glow--warm"></div>
+      <div class="scene-grain"></div>
 
-        <form id="login-form" class="login-form">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@example.com" required />
+      <!-- Floating mini-terminal shards — different skin color schemes -->
+      <div class="fl" style="--x:6%;--y:18%;--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--d:38s;--dl:0s;--rot:-4deg">
+        <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>blade-runner</span></div>
+        <div class="fl-term" style="background:var(--term)"><s></s><s style="width:70%;background:var(--accent)"></s><s style="width:45%"></s></div>
+      </div>
+      <div class="fl" style="--x:82%;--y:14%;--accent:#3b82f6;--bg:#0a0e1a;--term:#080c16;--d:44s;--dl:-6s;--rot:3deg">
+        <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-space</span></div>
+        <div class="fl-term" style="background:var(--term)"><s></s><s style="width:55%"></s><s style="width:80%;background:var(--accent)"></s></div>
+      </div>
+      <div class="fl" style="--x:78%;--y:72%;--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--d:36s;--dl:-14s;--rot:-2deg">
+        <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor</span></div>
+        <div class="fl-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:60%"></s><s style="width:40%"></s></div>
+      </div>
+      <div class="fl" style="--x:12%;--y:68%;--accent:#ff9900;--bg:#000;--term:#0a0a00;--d:42s;--dl:-10s;--rot:5deg">
+        <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lcars</span></div>
+        <div class="fl-term" style="background:var(--term)"><s style="width:90%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:70%"></s></div>
+      </div>
+      <div class="fl" style="--x:42%;--y:82%;--accent:#67e8f9;--bg:#0c1929;--term:#091422;--d:48s;--dl:-20s;--rot:-6deg">
+        <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>ice-nine</span></div>
+        <div class="fl-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:40%"></s></div>
+      </div>
+      <div class="fl" style="--x:88%;--y:45%;--accent:#a78bfa;--bg:#111116;--term:#0d0d12;--d:40s;--dl:-16s;--rot:2deg">
+        <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lunar</span></div>
+        <div class="fl-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:55%;background:var(--accent)"></s><s style="width:85%"></s></div>
+      </div>
+    </div>
 
-          <label for="license_key">License Key</label>
-          <input type="text" id="license_key" name="license_key" placeholder="MOLT-XXXX-XXXX-XXXX-XXXX" required />
+    <!-- Login card -->
+    <div class="login-card">
+      <div class="lc-bar">
+        <div class="lc-dots"><i></i><i></i><i></i></div>
+        <span class="lc-path">moltamp://community/auth</span>
+      </div>
+      <div class="lc-body">
+        <h1>Sign in<span class="caret">_</span></h1>
+        <p class="lc-sub">Authenticate with your license key to upload, rate, and download community skins.</p>
 
-          <label for="display_name">Display Name <span class="optional">(optional)</span></label>
-          <input type="text" id="display_name" name="display_name" placeholder="Your name" maxlength="50" />
+        <form id="login-form">
+          <div class="field">
+            <label for="email">email</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="license_key">license_key</label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="text" id="license_key" name="license_key" placeholder="MOLT-XXXX-XXXX-XXXX-XXXX" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="display_name">display_name <span class="opt">// optional</span></label>
+            <div class="input-wrap">
+              <span class="input-prefix">$</span>
+              <input type="text" id="display_name" name="display_name" placeholder="Your name" maxlength="50" />
+            </div>
+          </div>
 
           <p class="form-error" id="form-error" role="alert"></p>
 
-          <button type="submit" class="btn btn-primary login-btn" id="login-btn">
-            Sign In
+          <button type="submit" class="lc-submit" id="login-btn">
+            <span>authenticate</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </form>
 
-        <p class="login-note">Don't have a license? <a href="/buy">Get one for $20</a></p>
+        <div class="lc-footer">
+          <p>No license? <a href="/buy">$20 one-time, forever</a></p>
+        </div>
       </div>
     </div>
   </main>
-  <Footer />
 </BaseLayout>
 
 <script>
@@ -41,7 +95,7 @@ import Footer from '../components/Footer.astro';
   const btn = document.getElementById('login-btn') as HTMLButtonElement;
   const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
 
-  // Check if already logged in
+  // Redirect if already logged in
   fetch('/api/auth/me').then(r => {
     if (r.ok) window.location.href = '/dashboard';
   });
@@ -50,7 +104,7 @@ import Footer from '../components/Footer.astro';
     e.preventDefault();
     errorEl.textContent = '';
     btn.disabled = true;
-    btn.textContent = 'Signing in...';
+    btn.querySelector('span')!.textContent = 'authenticating...';
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -66,105 +120,382 @@ import Footer from '../components/Footer.astro';
       const data = await res.json();
 
       if (data.success) {
+        btn.querySelector('span')!.textContent = 'redirecting...';
         window.location.href = '/dashboard';
       } else {
         errorEl.textContent = data.error || 'Invalid credentials';
         btn.disabled = false;
-        btn.textContent = 'Sign In';
+        btn.querySelector('span')!.textContent = 'authenticate';
       }
     } catch {
-      errorEl.textContent = 'Something went wrong. Please try again.';
+      errorEl.textContent = 'Connection error. Try again.';
       btn.disabled = false;
-      btn.textContent = 'Sign In';
+      btn.querySelector('span')!.textContent = 'authenticate';
     }
   });
 </script>
 
 <style>
-  .login-page {
-    padding: calc(var(--nav-height) + 80px) 0 120px;
+  /* ── Scene ── */
+  .login-scene {
     min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--nav-height) + 40px) 24px 60px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .login-card {
-    max-width: 440px;
-    margin: 0 auto;
-    text-align: center;
-    padding: 48px 40px;
+  .scene-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .login-card h1 {
-    font-size: 1.8rem;
-    margin-bottom: 8px;
+  .scene-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(77, 159, 255, 0.08) 0%, transparent 70%);
   }
 
-  .login-desc {
-    color: var(--text-secondary);
-    margin-bottom: 32px;
-    font-size: 0.95rem;
+  .scene-glow--warm {
+    top: auto;
+    bottom: -200px;
+    left: 30%;
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255, 107, 77, 0.05) 0%, transparent 70%);
   }
 
-  .login-form {
-    text-align: left;
+  .scene-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
   }
 
-  .login-form label {
+  /* ── Floating terminal shards ── */
+  .fl {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 140px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 6%, transparent);
+    opacity: 0;
+    transform: rotate(var(--rot));
+    animation: drift var(--d) ease-in-out infinite var(--dl), shard-in 1.2s ease-out forwards;
+  }
+
+  .fl:nth-child(1) { animation-delay: var(--dl), 0.2s; }
+  .fl:nth-child(2) { animation-delay: var(--dl), 0.4s; }
+  .fl:nth-child(3) { animation-delay: var(--dl), 0.6s; }
+  .fl:nth-child(4) { animation-delay: var(--dl), 0.8s; }
+  .fl:nth-child(5) { animation-delay: var(--dl), 1.0s; }
+  .fl:nth-child(6) { animation-delay: var(--dl), 1.2s; }
+
+  @keyframes shard-in {
+    from { opacity: 0; transform: rotate(var(--rot)) translateY(20px) scale(0.9); }
+    to { opacity: 0.35; transform: rotate(var(--rot)) translateY(0) scale(1); }
+  }
+
+  @keyframes drift {
+    0%, 100% { translate: 0 0; }
+    25% { translate: 8px -12px; }
+    50% { translate: -4px -20px; }
+    75% { translate: -10px -8px; }
+  }
+
+  .fl-bar {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .fl-bar i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
     display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-    margin-top: 16px;
   }
 
-  .login-form label:first-of-type {
-    margin-top: 0;
-  }
-
-  .optional {
-    color: var(--text-dim);
-    font-weight: 400;
-  }
-
-  .login-form input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color var(--transition-fast);
-  }
-
-  .login-form input:focus {
-    border-color: var(--accent);
-  }
-
-  #license_key {
+  .fl-bar span {
+    flex: 1;
+    text-align: center;
     font-family: var(--font-mono);
-    letter-spacing: 0.04em;
+    font-size: 0.4rem;
+    color: color-mix(in srgb, var(--accent) 50%, transparent);
+    letter-spacing: 0.05em;
+  }
+
+  .fl-term {
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .fl-term s {
+    display: block;
+    height: 2px;
+    width: 80%;
+    border-radius: 1px;
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+    text-decoration: none;
+  }
+
+  /* ── Login card ── */
+  .login-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 460px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(14, 14, 18, 0.85);
+    backdrop-filter: blur(24px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.3),
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 0 80px rgba(77, 159, 255, 0.03);
+    animation: card-in 0.8s ease-out both;
+  }
+
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .lc-bar {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .lc-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .lc-dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: block;
+  }
+
+  .lc-dots i:nth-child(1) { background: #ff5f57; }
+  .lc-dots i:nth-child(2) { background: #febc2e; }
+  .lc-dots i:nth-child(3) { background: #28c840; }
+
+  .lc-path {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+    margin-right: 30px; /* balance the dots width */
+  }
+
+  .lc-body {
+    padding: 40px 36px 36px;
+  }
+
+  .lc-body h1 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .caret {
+    color: var(--accent);
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .lc-sub {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  /* ── Form ── */
+  .field {
+    margin-bottom: 20px;
+  }
+
+  .field label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .opt {
+    color: rgba(255, 255, 255, 0.2);
+    font-style: italic;
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(77, 159, 255, 0.1), 0 0 20px rgba(77, 159, 255, 0.05);
+  }
+
+  .input-prefix {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    padding: 0 0 0 14px;
+    opacity: 0.5;
+    user-select: none;
+  }
+
+  .input-wrap input {
+    flex: 1;
+    padding: 13px 14px 13px 8px;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    outline: none;
+    letter-spacing: 0.01em;
+  }
+
+  .input-wrap input::placeholder {
+    color: rgba(255, 255, 255, 0.15);
   }
 
   .form-error {
     color: #ef4444;
-    font-size: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
     min-height: 1.2em;
-    margin-top: 12px;
+    margin-bottom: 4px;
   }
 
-  .login-btn {
+  /* ── Submit ── */
+  .lc-submit {
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
     margin-top: 8px;
-    padding: 14px;
-    font-size: 1rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 24px rgba(77, 159, 255, 0.2);
   }
 
-  .login-note {
-    margin-top: 24px;
-    font-size: 0.85rem;
+  .lc-submit:hover:not(:disabled) {
+    background: var(--accent-hover);
+    box-shadow: 0 0 36px rgba(77, 159, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .lc-submit:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .lc-submit svg {
+    transition: transform 0.2s;
+  }
+
+  .lc-submit:hover:not(:disabled) svg {
+    transform: translateX(3px);
+  }
+
+  /* ── Footer ── */
+  .lc-footer {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+  }
+
+  .lc-footer p {
+    font-size: 0.82rem;
     color: var(--text-dim);
+  }
+
+  .lc-footer a {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 520px) {
+    .lc-body {
+      padding: 32px 24px 28px;
+    }
+
+    .lc-body h1 {
+      font-size: 1.6rem;
+    }
+
+    .fl {
+      display: none;
+    }
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .fl {
+      animation: none;
+      opacity: 0.3;
+    }
+
+    .login-card {
+      animation: none;
+    }
+
+    .caret {
+      animation: none;
+    }
   }
 </style>
