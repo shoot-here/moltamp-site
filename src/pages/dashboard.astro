@@ -20,7 +20,11 @@ import Footer from '../components/Footer.astro';
         <div class="dash-actions">
           <a href="/skins" class="btn btn-secondary btn-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            Gallery
+            Skins
+          </a>
+          <a href="/widgets" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            Widgets
           </a>
           <button class="btn btn-secondary btn-sm" id="logout-btn">Sign Out</button>
         </div>
@@ -77,6 +81,58 @@ import Footer from '../components/Footer.astro';
           <p class="empty-hint">Package a skin folder as a <code>.zip</code> and upload above.</p>
         </div>
       </section>
+
+      <!-- Widget Upload Section -->
+      <section class="dash-section">
+        <div class="section-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload a Widget</span>
+        </div>
+        <form id="widget-upload-form" class="upload-form">
+          <div class="upload-drop" id="widget-upload-drop">
+            <div class="drop-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
+              </svg>
+            </div>
+            <p class="drop-text">Drop a <code>.zip</code> widget archive here</p>
+            <p class="drop-hint">Must contain <code>widget.json</code> + <code>index.html</code></p>
+            <input type="file" id="widget-file-input" accept=".zip" />
+          </div>
+
+          <div class="upload-fields" id="widget-upload-fields" style="display:none">
+            <div class="upload-file-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              <span id="widget-upload-filename" class="mono"></span>
+            </div>
+
+            <div class="field">
+              <label for="widget-upload-tags">tags <span class="opt">// comma-separated, max 5</span></label>
+              <input type="text" id="widget-upload-tags" placeholder="telemetry, git, status" maxlength="120" />
+            </div>
+
+            <p class="form-error" id="widget-upload-error" role="alert"></p>
+
+            <button type="submit" class="btn btn-primary upload-btn" id="widget-upload-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload Widget
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- My Widgets -->
+      <section class="dash-section">
+        <div class="section-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          <span>My Widgets</span>
+        </div>
+        <div id="my-widgets" class="my-widgets-grid"></div>
+        <div id="no-widgets" class="empty-msg" style="display:none">
+          <p>You haven't uploaded any widgets yet.</p>
+          <p class="empty-hint">Package a widget folder (with <code>widget.json</code> + <code>index.html</code>) as a <code>.zip</code> and upload above.</p>
+        </div>
+      </section>
     </div>
   </main>
   <Footer />
@@ -95,7 +151,7 @@ import Footer from '../components/Footer.astro';
     avatar.textContent = data.user.display_name[0].toUpperCase();
   }
 
-  checkAuth().then(() => loadMySkins());
+  checkAuth().then(() => { loadMySkins(); loadMyWidgets(); });
 
   // Logout
   document.getElementById('logout-btn')!.addEventListener('click', async () => {
@@ -268,6 +324,122 @@ import Footer from '../components/Footer.astro';
           if (statusEl) { statusEl.style.color = '#ef4444'; statusEl.textContent = 'Upload failed'; }
         }
         fi.value = '';
+      });
+    });
+  }
+
+  // ── Widget Upload ──
+  const widgetDropZone = document.getElementById('widget-upload-drop')!;
+  const widgetFileInput = document.getElementById('widget-file-input') as HTMLInputElement;
+  const widgetUploadFields = document.getElementById('widget-upload-fields')!;
+  const widgetUploadFilename = document.getElementById('widget-upload-filename')!;
+  const widgetUploadForm = document.getElementById('widget-upload-form') as HTMLFormElement;
+  const widgetUploadBtn = document.getElementById('widget-upload-btn') as HTMLButtonElement;
+  const widgetUploadError = document.getElementById('widget-upload-error')!;
+  let selectedWidgetFile: File | null = null;
+
+  widgetDropZone.addEventListener('click', () => widgetFileInput.click());
+  widgetDropZone.addEventListener('dragover', (e) => { e.preventDefault(); widgetDropZone.classList.add('drag-over'); });
+  widgetDropZone.addEventListener('dragleave', () => widgetDropZone.classList.remove('drag-over'));
+  widgetDropZone.addEventListener('drop', (e) => { e.preventDefault(); widgetDropZone.classList.remove('drag-over'); if (e.dataTransfer?.files[0]) selectWidgetFile(e.dataTransfer.files[0]); });
+  widgetFileInput.addEventListener('change', () => { if (widgetFileInput.files?.[0]) selectWidgetFile(widgetFileInput.files[0]); });
+
+  function selectWidgetFile(file: File) {
+    selectedWidgetFile = file;
+    widgetUploadFilename.textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+    widgetUploadFields.style.display = 'block';
+    widgetUploadError.textContent = '';
+  }
+
+  widgetUploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!selectedWidgetFile) return;
+    widgetUploadError.textContent = '';
+    widgetUploadBtn.disabled = true;
+    widgetUploadBtn.querySelector('svg')!.style.display = 'none';
+    widgetUploadBtn.childNodes[widgetUploadBtn.childNodes.length - 1].textContent = ' Uploading...';
+
+    const formData = new FormData();
+    formData.append('file', selectedWidgetFile);
+    const tags = (document.getElementById('widget-upload-tags') as HTMLInputElement).value;
+    if (tags) formData.append('tags', tags);
+
+    try {
+      const res = await fetch('/api/widgets', { method: 'POST', body: formData });
+      let data: any;
+      try { data = await res.json(); } catch { throw new Error(`Server returned ${res.status}`); }
+
+      if (data.success) {
+        selectedWidgetFile = null;
+        widgetFileInput.value = '';
+        widgetUploadFields.style.display = 'none';
+        resetWidgetUploadBtn();
+        loadMyWidgets();
+      } else {
+        const msg = data.errors?.join('; ') || data.error || 'Upload failed';
+        widgetUploadError.style.color = '#ef4444';
+        widgetUploadError.textContent = msg;
+        resetWidgetUploadBtn();
+      }
+    } catch (err) {
+      widgetUploadError.style.color = '#ef4444';
+      widgetUploadError.textContent = err instanceof Error ? err.message : 'Something went wrong.';
+      resetWidgetUploadBtn();
+    }
+  });
+
+  function resetWidgetUploadBtn() {
+    widgetUploadBtn.disabled = false;
+    widgetUploadBtn.querySelector('svg')!.style.display = '';
+    widgetUploadBtn.childNodes[widgetUploadBtn.childNodes.length - 1].textContent = ' Upload Widget';
+  }
+
+  // My widgets
+  async function loadMyWidgets() {
+    const res = await fetch('/api/widgets/mine');
+    if (!res.ok) return;
+    const data = await res.json();
+    const container = document.getElementById('my-widgets')!;
+    const noWidgets = document.getElementById('no-widgets')!;
+
+    if (data.widgets.length === 0) { container.innerHTML = ''; noWidgets.style.display = 'flex'; return; }
+    noWidgets.style.display = 'none';
+
+    container.innerHTML = data.widgets.map((widget: any) => {
+      return `
+      <div class="my-widget-card">
+        <div class="my-widget-row">
+          <div class="my-widget-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          </div>
+          <div class="my-widget-info">
+            <h3>${widget.name}</h3>
+            <p class="widget-desc">${widget.description || 'No description'}</p>
+            <div class="my-widget-meta">
+              <span>v${widget.version}</span>
+              <span>\u00B7</span>
+              <span>${widget.download_count} downloads</span>
+              <span>\u00B7</span>
+              <span>${(widget.file_size / 1024).toFixed(0)} KB</span>
+              <span>\u00B7</span>
+              <span class="status-${widget.status}">${widget.status}</span>
+            </div>
+            <div class="my-widget-actions">
+              <a href="/widgets/view?id=${widget.widget_id}" class="btn btn-secondary btn-xs">View</a>
+              <button class="btn btn-secondary btn-xs widget-delete-btn" data-widget-id="${widget.widget_id}" style="color:#ef4444;border-color:rgba(239,68,68,0.2)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Delete handlers
+    container.querySelectorAll('.widget-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const widgetId = (btn as HTMLElement).dataset.widgetId;
+        if (!confirm(`Delete widget "${widgetId}"?`)) return;
+        const res = await fetch(`/api/widgets/${widgetId}`, { method: 'DELETE' });
+        if (res.ok) loadMyWidgets();
       });
     });
   }
@@ -594,11 +766,80 @@ import Footer from '../components/Footer.astro';
     font-size: 0.82rem;
   }
 
+  /* ── My Widgets ── */
+  .my-widgets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .my-widget-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color 0.2s;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .my-widget-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .my-widget-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 16px 20px;
+  }
+
+  .my-widget-icon {
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  .my-widget-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .my-widget-info h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+
+  .widget-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .my-widget-meta {
+    display: flex;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    align-items: center;
+  }
+
+  .my-widget-actions {
+    display: flex;
+    gap: 8px;
+  }
+
   /* ── Responsive ── */
   @media (max-width: 600px) {
     .dash-header { flex-direction: column; align-items: flex-start; }
     .my-skin-row { flex-direction: column; }
     .my-skin-preview { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .my-skin-info { padding: 16px; }
+    .my-widget-row { flex-direction: column; align-items: flex-start; }
   }
 </style>
