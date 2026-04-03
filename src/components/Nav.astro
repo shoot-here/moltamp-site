@@ -4,14 +4,8 @@
 <nav class="nav">
   <div class="container nav-inner">
     <a href="/" class="nav-logo">
-      <span class="logo-icon">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-          <rect x="2" y="2" width="28" height="28" rx="4" stroke="currentColor" stroke-width="2"/>
-          <rect x="6" y="6" width="12" height="3" rx="1" fill="currentColor" opacity="0.7"/>
-          <rect x="6" y="11" width="20" height="13" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </span>
-      <span class="logo-text">moltamp</span>
+      <img src="/images/logo.png" alt="MOLTamp" class="logo-img" />
+      <span class="logo-text">MOLTamp</span>
     </a>
 
     <div class="nav-links">
@@ -65,8 +59,10 @@
     color: var(--text-primary);
   }
 
-  .logo-icon {
-    color: var(--accent);
+  .logo-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
   }
 
   .logo-text {

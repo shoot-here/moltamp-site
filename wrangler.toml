@@ -1,14 +1,10 @@
 name = "moltamp-site"
 compatibility_date = "2024-12-01"
 
-# Uncomment after creating D1 database:
-#   npx wrangler d1 create moltamp-db
-# Then paste the database_id below and uncomment the block.
-
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "moltamp-db"
-# database_id = ""
+[[d1_databases]]
+binding = "DB"
+database_name = "moltamp-db"
+database_id = "991a339f-e3ff-4c40-83f1-0eaa0e0488b4"
 
 [vars]
 STRIPE_PUBLISHABLE_KEY = "" # TODO: set in Cloudflare dashboard
@@ -16,3 +12,4 @@ STRIPE_PUBLISHABLE_KEY = "" # TODO: set in Cloudflare dashboard
 # STRIPE_SECRET_KEY = "sk_..."
 # STRIPE_WEBHOOK_SECRET = "whsec_..."
 # STRIPE_PRICE_ID = "price_..."
+# LICENSE_HMAC_SECRET = "..." — used to sign license validation responses

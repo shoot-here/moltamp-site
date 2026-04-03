@@ -5,7 +5,8 @@ const year = new Date().getFullYear();
 <footer class="footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <span class="footer-logo mono">moltamp</span>
+      <img src="/images/logo.png" alt="MOLTamp" class="footer-logo-img" />
+      <span class="footer-logo mono">MOLTamp</span>
       <p>Skinnable shell for Claude Code.</p>
     </div>
 
@@ -54,6 +55,13 @@ const year = new Date().getFullYear();
 
   .footer-brand {
     max-width: 280px;
+  }
+
+  .footer-logo-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-bottom: 8px;
   }
 
   .footer-logo {

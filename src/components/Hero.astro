@@ -4,19 +4,21 @@
 <section class="hero">
   <div class="container">
     <div class="hero-content">
+      <img src="/images/logo.png" alt="MOLTamp" class="hero-logo" />
+
       <span class="badge">
         <span class="badge-dot"></span>
         Now in public beta
       </span>
 
       <h1>
-        Your AI terminal<br />
-        deserves a <span class="gradient-text">cockpit</span>.
+        Skin your<br />
+        <span class="gradient-text">AI terminal</span>.
       </h1>
 
       <p class="hero-sub">
-        Moltamp wraps Claude Code in a fully skinnable shell with panels, widgets,
-        music, and Live2D companions. Think Winamp for AI terminals.
+        MOLTamp wraps Claude Code in a cockpit UI with skins, panels, a music player,
+        Live2D desk pets, and real-time telemetry. The vibes are the feature.
       </p>
 
       <div class="hero-actions">
@@ -29,11 +31,11 @@
           Download for Mac
         </a>
         <a href="https://github.com/shoot-here/moltamp" class="btn btn-secondary" target="_blank" rel="noopener">
-          View on GitHub
+          View Source
         </a>
       </div>
 
-      <p class="hero-note">Free forever. $10 to remove the nag and support development.</p>
+      <p class="hero-note">Free forever. $10 kills the nag popup.</p>
     </div>
 
     <div class="hero-screenshot">
@@ -43,7 +45,7 @@
             <div class="ph-dot"></div>
             <div class="ph-dot"></div>
             <div class="ph-dot"></div>
-            <span class="ph-title">moltamp</span>
+            <span class="ph-title">MOLTamp</span>
           </div>
           <div class="placeholder-body">
             <div class="ph-sidebar">
@@ -53,9 +55,8 @@
             </div>
             <div class="ph-terminal">
               <div class="ph-line"><span class="ph-prompt">&gt;</span> claude --skin cyberdeck</div>
-              <div class="ph-line ph-dim">Loading skin: Cyberdeck v2.1</div>
-              <div class="ph-line ph-dim">Panels: intel, signal, telemetry</div>
-              <div class="ph-line ph-dim">Widgets: music, companion, ticker</div>
+              <div class="ph-line ph-dim">Panels loaded. Music playing. Vibes immaculate.</div>
+              <div class="ph-line ph-dim">TypeCat is watching you type.</div>
               <div class="ph-line"><span class="ph-cursor">_</span></div>
             </div>
             <div class="ph-sidebar-right">
@@ -99,6 +100,15 @@
     z-index: 1;
   }
 
+  .hero-logo {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    margin: 0 auto 20px;
+    display: block;
+    filter: drop-shadow(0 0 24px rgba(255, 80, 40, 0.3));
+  }
+
   .badge-dot {
     width: 6px;
     height: 6px;
@@ -127,7 +137,7 @@
   .hero-sub {
     color: var(--text-secondary);
     font-size: 1.2rem;
-    max-width: 580px;
+    max-width: 560px;
     margin: 0 auto 40px;
     line-height: 1.7;
   }
