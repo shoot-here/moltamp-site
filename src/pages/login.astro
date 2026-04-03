@@ -13,27 +13,27 @@ import Nav from '../components/Nav.astro';
       <div class="scene-grain"></div>
 
       <!-- Floating mini-terminal shards — different skin color schemes -->
-      <div class="fl" style="--x:6%;--y:18%;--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--d:38s;--dl:0s;--rot:-4deg">
+      <div class="fl" data-depth="0.03" style="--x:6%;--y:18%;--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--d:38s;--dl:0s;--rot:-4deg">
         <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>blade-runner</span></div>
         <div class="fl-term" style="background:var(--term)"><s></s><s style="width:70%;background:var(--accent)"></s><s style="width:45%"></s></div>
       </div>
-      <div class="fl" style="--x:82%;--y:14%;--accent:#3b82f6;--bg:#0a0e1a;--term:#080c16;--d:44s;--dl:-6s;--rot:3deg">
+      <div class="fl" data-depth="0.05" style="--x:82%;--y:14%;--accent:#3b82f6;--bg:#0a0e1a;--term:#080c16;--d:44s;--dl:-6s;--rot:3deg">
         <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-space</span></div>
         <div class="fl-term" style="background:var(--term)"><s></s><s style="width:55%"></s><s style="width:80%;background:var(--accent)"></s></div>
       </div>
-      <div class="fl" style="--x:78%;--y:72%;--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--d:36s;--dl:-14s;--rot:-2deg">
+      <div class="fl" data-depth="0.02" style="--x:78%;--y:72%;--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--d:36s;--dl:-14s;--rot:-2deg">
         <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor</span></div>
         <div class="fl-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:60%"></s><s style="width:40%"></s></div>
       </div>
-      <div class="fl" style="--x:12%;--y:68%;--accent:#ff9900;--bg:#000;--term:#0a0a00;--d:42s;--dl:-10s;--rot:5deg">
+      <div class="fl" data-depth="0.06" style="--x:12%;--y:68%;--accent:#ff9900;--bg:#000;--term:#0a0a00;--d:42s;--dl:-10s;--rot:5deg">
         <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lcars</span></div>
         <div class="fl-term" style="background:var(--term)"><s style="width:90%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:70%"></s></div>
       </div>
-      <div class="fl" style="--x:42%;--y:82%;--accent:#67e8f9;--bg:#0c1929;--term:#091422;--d:48s;--dl:-20s;--rot:-6deg">
+      <div class="fl" data-depth="0.04" style="--x:42%;--y:82%;--accent:#67e8f9;--bg:#0c1929;--term:#091422;--d:48s;--dl:-20s;--rot:-6deg">
         <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>ice-nine</span></div>
         <div class="fl-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:40%"></s></div>
       </div>
-      <div class="fl" style="--x:88%;--y:45%;--accent:#a78bfa;--bg:#111116;--term:#0d0d12;--d:40s;--dl:-16s;--rot:2deg">
+      <div class="fl" data-depth="0.07" style="--x:88%;--y:45%;--accent:#a78bfa;--bg:#111116;--term:#0d0d12;--d:40s;--dl:-16s;--rot:2deg">
         <div class="fl-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lunar</span></div>
         <div class="fl-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:55%;background:var(--accent)"></s><s style="width:85%"></s></div>
       </div>
@@ -184,6 +184,31 @@ import Nav from '../components/Nav.astro';
       btn.querySelector('span')!.textContent = 'authenticate';
     }
   });
+
+  // Parallax — floating terminals follow mouse with different depth speeds
+  const floaters = document.querySelectorAll<HTMLElement>('.fl');
+  let mx = 0, my = 0, cx = 0, cy = 0;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReduced) {
+    document.addEventListener('mousemove', (e) => {
+      mx = (e.clientX / window.innerWidth - 0.5) * 2;
+      my = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    function tick() {
+      cx += (mx - cx) * 0.08;
+      cy += (my - cy) * 0.08;
+      floaters.forEach(fl => {
+        const depth = parseFloat(fl.dataset.depth || '0.03');
+        const x = cx * depth * 800;
+        const y = cy * depth * 600;
+        fl.style.translate = `${x}px ${y}px`;
+      });
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
 </script>
 
 <style>
