@@ -244,46 +244,41 @@ import Footer from '../components/Footer.astro';
       const c = skin.colors;
       const tags = skin.tags?.length ? skin.tags.join(', ') : '';
       return `
-      <div class="sk-card" style="border-color:${c.chromeBorder}">
-        <a href="/skins/view?id=${skin.skin_id}" class="sk-thumb mt-sm" style="background:${c.chromeBg}">
-          <div class="mini-terminal" style="background:${c.chromeBg}">
-            <div class="mt-titlebar" style="border-bottom:1px solid ${c.chromeBorder}"><div class="mt-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div></div>
-            <div class="mt-deck"><div class="mt-term" style="background:${c.background}"><div class="mt-line"><span style="color:${c.green}">$</span><span style="color:${c.foreground}"> _</span></div></div></div>
-            <div class="mt-status" style="border-top:1px solid ${c.chromeBorder};color:${c.chromeDim}"><span class="mt-status-dot" style="background:${c.accent}"></span></div>
+      <div style="display:flex;border:1px solid ${c.chromeBorder};border-radius:8px;overflow:hidden;margin-bottom:8px">
+        <a href="/skins/view?id=${skin.skin_id}" style="width:80px;height:80px;flex-shrink:0;display:block;overflow:hidden;background:${c.chromeBg}">
+          <div style="width:80px;height:80px;display:flex;flex-direction:column;font-family:var(--font-mono);font-size:0.4rem">
+            <div style="display:flex;align-items:center;gap:3px;padding:4px 6px;border-bottom:1px solid ${c.chromeBorder}"><span style="width:5px;height:5px;border-radius:50%;background:#ff5f57;display:block"></span><span style="width:5px;height:5px;border-radius:50%;background:#febc2e;display:block"></span><span style="width:5px;height:5px;border-radius:50%;background:#28c840;display:block"></span></div>
+            <div style="flex:1;background:${c.background};padding:4px 6px;display:flex;flex-direction:column;justify-content:flex-end"><span style="color:${c.green}">$ <span style="color:${c.foreground}">_</span></span></div>
+            <div style="padding:2px 6px;border-top:1px solid ${c.chromeBorder};display:flex;align-items:center;gap:3px"><span style="width:4px;height:4px;border-radius:50%;background:${c.accent};display:block"></span><span style="color:${c.chromeDim};font-size:0.3rem">${skin.skin_id}</span></div>
           </div>
         </a>
-        <div class="sk-body">
-          <div class="sk-top">
-            <a href="/skins/view?id=${skin.skin_id}" class="sk-name" style="color:${c.accent}">${skin.name}</a>
-            <div class="sk-meta">
-              <span>v${skin.version}</span>
-              <span>${skin.download_count} dl</span>
-              <span>${(skin.file_size / 1024).toFixed(0)} KB</span>
-              <span class="status-${skin.status}">${skin.status}</span>
-            </div>
+        <div style="flex:1;padding:10px 14px;min-width:0">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px">
+            <a href="/skins/view?id=${skin.skin_id}" style="font-family:var(--font-heading);font-weight:700;font-size:0.92rem;color:${c.accent};text-decoration:none">${skin.name}</a>
+            <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-dim);white-space:nowrap">v${skin.version} · ${skin.download_count} dl · ${(skin.file_size / 1024).toFixed(0)} KB · <span class="status-${skin.status}">${skin.status}</span></span>
           </div>
-          <p class="sk-desc" id="desc-display-${skin.skin_id}">${skin.description}</p>
-          ${tags ? `<p class="sk-tags">${tags}</p>` : ''}
+          <p style="font-size:0.8rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px" id="desc-display-${skin.skin_id}">${skin.description}</p>
+          ${tags ? `<p style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text-dim);margin-bottom:2px">${tags}</p>` : ''}
           <!-- Edit form (hidden) -->
-          <div class="sk-edit-form" id="edit-form-${skin.skin_id}" style="display:none">
-            <textarea class="sk-edit-textarea" id="edit-desc-${skin.skin_id}" rows="2" maxlength="500">${skin.description}</textarea>
-            <input type="text" class="sk-edit-input" id="edit-tags-${skin.skin_id}" value="${tags}" placeholder="tag1, tag2, tag3" maxlength="120" />
-            <div class="sk-edit-actions">
+          <div id="edit-form-${skin.skin_id}" style="display:none;margin:6px 0">
+            <textarea id="edit-desc-${skin.skin_id}" rows="2" maxlength="500" style="width:100%;padding:6px 8px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:0.8rem;resize:vertical;outline:none;margin-bottom:4px">${skin.description}</textarea>
+            <input type="text" id="edit-tags-${skin.skin_id}" value="${tags}" placeholder="tag1, tag2, tag3" maxlength="120" style="width:100%;max-width:280px;padding:5px 8px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.72rem;outline:none;margin-bottom:6px" />
+            <div style="display:flex;gap:6px;align-items:center">
               <button class="btn btn-primary btn-xs save-edit-btn" data-skin-id="${skin.skin_id}">Save</button>
               <button class="btn btn-secondary btn-xs cancel-edit-btn" data-skin-id="${skin.skin_id}">Cancel</button>
-              <span class="sk-edit-status" id="edit-status-${skin.skin_id}"></span>
+              <span style="font-family:var(--font-mono);font-size:0.7rem" id="edit-status-${skin.skin_id}"></span>
             </div>
           </div>
-          <div class="sk-actions">
+          <div style="display:flex;gap:6px;margin-top:6px">
             <a href="/skins/view?id=${skin.skin_id}" class="btn btn-secondary btn-xs">View</a>
             <button class="btn btn-secondary btn-xs edit-btn" data-skin-id="${skin.skin_id}">Edit</button>
-            <label class="btn btn-secondary btn-xs ss-upload-btn">
+            <label class="btn btn-secondary btn-xs">
               Screenshots
               <input type="file" accept="image/png,image/jpeg,image/webp" multiple data-skin-id="${skin.skin_id}" class="ss-file-input" style="display:none" />
             </label>
             <button class="btn btn-secondary btn-xs delete-btn" data-skin-id="${skin.skin_id}" style="color:#ef4444;border-color:rgba(239,68,68,0.2)">Delete</button>
           </div>
-          <p class="ss-status" id="ss-status-${skin.skin_id}"></p>
+          <p style="font-family:var(--font-mono);font-size:0.7rem;margin-top:4px;min-height:0" id="ss-status-${skin.skin_id}"></p>
         </div>
       </div>`;
     }).join('');
