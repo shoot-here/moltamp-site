@@ -242,47 +242,43 @@ import Footer from '../components/Footer.astro';
 
     container.innerHTML = data.skins.map((skin: any) => {
       const c = skin.colors;
+      const tags = skin.tags?.length ? skin.tags.join(', ') : '';
       return `
-      <div class="my-skin-card" style="background:${c.chromeBg};border-color:${c.chromeBorder}">
-        <div class="my-skin-row">
-          <a href="/skins/view?id=${skin.skin_id}" class="my-skin-preview mt-sm">
-            <div class="mini-terminal" style="background:${c.chromeBg}">
-              <div class="mt-titlebar" style="border-bottom:1px solid ${c.chromeBorder}">
-                <div class="mt-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div>
-                <div class="mt-title" style="color:${c.chromeDim}">${skin.name}</div>
-              </div>
-              <div class="mt-vibes" style="background:linear-gradient(90deg,${c.chromeBg},${c.accent}22,${c.chromeBg});border-bottom:1px solid ${c.chromeBorder}"></div>
-              <div class="mt-deck">
-                <div class="mt-panel-left" style="border-right:1px solid ${c.chromeBorder}"><div class="mt-nav-item"><span class="mt-nav-dot" style="background:${c.accent};opacity:0.8"></span><span class="mt-nav-bar" style="background:${c.accent};opacity:0.5"></span></div></div>
-                <div class="mt-term" style="background:${c.background}"><div class="mt-line"><span style="color:${c.green}">$</span><span style="color:${c.foreground}"> deploy</span></div><div class="mt-line" style="color:${c.green}">ok</div><div class="mt-line"><span style="color:${c.accent}">></span><span style="color:${c.cursor}"> _</span></div></div>
-                <div class="mt-panel-right" style="border-left:1px solid ${c.chromeBorder}"><div class="mt-gauge" style="border-color:${c.chromeBorder};border-top-color:${c.accent}"></div></div>
-              </div>
-              <div class="mt-status" style="border-top:1px solid ${c.chromeBorder};color:${c.chromeDim}"><span class="mt-status-dot" style="background:${c.accent}"></span><span class="mt-status-name">${skin.skin_id}</span></div>
-            </div>
-          </a>
-          <div class="my-skin-info">
-            <h3 style="color:${c.accent}">${skin.name}</h3>
-            <p class="skin-desc" style="color:${c.chromeDim}">${skin.description}</p>
-            <div class="my-skin-meta" style="color:${c.chromeDim}">
+      <div class="sk-card">
+        <div class="sk-accent" style="background:${c.accent}"></div>
+        <div class="sk-body">
+          <div class="sk-top">
+            <a href="/skins/view?id=${skin.skin_id}" class="sk-name" style="color:${c.accent}">${skin.name}</a>
+            <div class="sk-meta">
+              <span>${skin.skin_id}</span>
               <span>v${skin.version}</span>
-              <span>\u00B7</span>
-              <span>${skin.download_count} downloads</span>
-              <span>\u00B7</span>
+              <span>${skin.download_count} dl</span>
               <span>${(skin.file_size / 1024).toFixed(0)} KB</span>
-              <span>\u00B7</span>
               <span class="status-${skin.status}">${skin.status}</span>
             </div>
-            <div class="my-skin-actions">
-              <a href="/skins/view?id=${skin.skin_id}" class="btn btn-secondary btn-xs">View</a>
-              <label class="btn btn-secondary btn-xs ss-upload-btn">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Screenshots
-                <input type="file" accept="image/png,image/jpeg,image/webp" multiple data-skin-id="${skin.skin_id}" class="ss-file-input" style="display:none" />
-              </label>
-              <button class="btn btn-secondary btn-xs delete-btn" data-skin-id="${skin.skin_id}" style="color:#ef4444;border-color:rgba(239,68,68,0.2)">Delete</button>
-            </div>
-            <p class="ss-status" id="ss-status-${skin.skin_id}"></p>
           </div>
+          <p class="sk-desc" id="desc-display-${skin.skin_id}">${skin.description}</p>
+          ${tags ? `<p class="sk-tags">${tags}</p>` : ''}
+          <!-- Edit form (hidden) -->
+          <div class="sk-edit-form" id="edit-form-${skin.skin_id}" style="display:none">
+            <textarea class="sk-edit-textarea" id="edit-desc-${skin.skin_id}" rows="2" maxlength="500">${skin.description}</textarea>
+            <input type="text" class="sk-edit-input" id="edit-tags-${skin.skin_id}" value="${tags}" placeholder="tag1, tag2, tag3" maxlength="120" />
+            <div class="sk-edit-actions">
+              <button class="btn btn-primary btn-xs save-edit-btn" data-skin-id="${skin.skin_id}">Save</button>
+              <button class="btn btn-secondary btn-xs cancel-edit-btn" data-skin-id="${skin.skin_id}">Cancel</button>
+              <span class="sk-edit-status" id="edit-status-${skin.skin_id}"></span>
+            </div>
+          </div>
+          <div class="sk-actions">
+            <a href="/skins/view?id=${skin.skin_id}" class="btn btn-secondary btn-xs">View</a>
+            <button class="btn btn-secondary btn-xs edit-btn" data-skin-id="${skin.skin_id}">Edit</button>
+            <label class="btn btn-secondary btn-xs ss-upload-btn">
+              Screenshots
+              <input type="file" accept="image/png,image/jpeg,image/webp" multiple data-skin-id="${skin.skin_id}" class="ss-file-input" style="display:none" />
+            </label>
+            <button class="btn btn-secondary btn-xs delete-btn" data-skin-id="${skin.skin_id}" style="color:#ef4444;border-color:rgba(239,68,68,0.2)">Delete</button>
+          </div>
+          <p class="ss-status" id="ss-status-${skin.skin_id}"></p>
         </div>
       </div>`;
     }).join('');
@@ -294,6 +290,50 @@ import Footer from '../components/Footer.astro';
         if (!confirm(`Delete "${skinId}"?`)) return;
         const res = await fetch(`/api/skins/${skinId}`, { method: 'DELETE' });
         if (res.ok) loadMySkins();
+      });
+    });
+
+    // Edit handlers
+    container.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const skinId = (btn as HTMLElement).dataset.skinId!;
+        const form = document.getElementById(`edit-form-${skinId}`)!;
+        const desc = document.getElementById(`desc-display-${skinId}`)!;
+        const tags = desc.nextElementSibling as HTMLElement;
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        desc.style.display = form.style.display === 'none' ? '' : 'none';
+        if (tags?.classList.contains('sk-tags')) tags.style.display = desc.style.display;
+      });
+    });
+
+    container.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const skinId = (btn as HTMLElement).dataset.skinId!;
+        document.getElementById(`edit-form-${skinId}`)!.style.display = 'none';
+        document.getElementById(`desc-display-${skinId}`)!.style.display = '';
+        const tags = document.getElementById(`desc-display-${skinId}`)!.nextElementSibling as HTMLElement;
+        if (tags?.classList.contains('sk-tags')) tags.style.display = '';
+      });
+    });
+
+    container.querySelectorAll('.save-edit-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const skinId = (btn as HTMLElement).dataset.skinId!;
+        const statusEl = document.getElementById(`edit-status-${skinId}`)!;
+        const desc = (document.getElementById(`edit-desc-${skinId}`) as HTMLTextAreaElement).value;
+        const tags = (document.getElementById(`edit-tags-${skinId}`) as HTMLInputElement).value;
+        statusEl.textContent = 'Saving...';
+        statusEl.style.color = 'var(--text-dim)';
+        try {
+          const res = await fetch(`/api/skins/${skinId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description: desc, tags }),
+          });
+          const data = await res.json();
+          if (data.success) { loadMySkins(); }
+          else { statusEl.textContent = data.error || 'Failed'; statusEl.style.color = '#ef4444'; }
+        } catch { statusEl.textContent = 'Error'; statusEl.style.color = '#ef4444'; }
       });
     });
 
@@ -651,70 +691,127 @@ import Footer from '../components/Footer.astro';
     gap: 8px;
   }
 
-  /* ── My Skins ── */
+  /* ── My Skins (compact cards) ── */
   .my-skins-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
   }
 
-  .my-skin-card {
-    border: 1px solid;
-    border-radius: var(--radius-md);
+  .sk-card {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s;
   }
 
-  .my-skin-card:hover {
-    border-color: rgba(255, 255, 255, 0.12);
-  }
+  .sk-card:hover { border-color: var(--border-hover); }
 
-  .my-skin-row {
-    display: flex;
-    gap: 20px;
-    align-items: stretch;
-  }
-
-  .my-skin-preview {
-    width: 200px;
+  .sk-accent {
+    width: 4px;
     flex-shrink: 0;
-    display: block;
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
   }
 
-  .my-skin-info {
+  .sk-body {
     flex: 1;
-    padding: 16px 20px 16px 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding: 12px 16px;
   }
 
-  .my-skin-info h3 {
+  .sk-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .sk-name {
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  .sk-name:hover { text-decoration: underline; }
+
+  .sk-meta {
+    display: flex;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .sk-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sk-tags {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .sk-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  /* Edit form */
+  .sk-edit-form { margin: 8px 0; }
+
+  .sk-edit-textarea {
+    width: 100%;
+    padding: 8px 10px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-family: var(--font-display);
+    resize: vertical;
+    outline: none;
     margin-bottom: 6px;
   }
 
-  .skin-desc {
-    font-size: 0.82rem;
-    margin-bottom: 10px;
-    line-height: 1.5;
+  .sk-edit-textarea:focus { border-color: var(--accent); }
+
+  .sk-edit-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    outline: none;
+    margin-bottom: 8px;
   }
 
-  .my-skin-meta {
+  .sk-edit-input:focus { border-color: var(--accent); }
+
+  .sk-edit-actions {
     display: flex;
     gap: 6px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    margin-bottom: 14px;
     align-items: center;
   }
 
-  .my-skin-actions {
-    display: flex;
-    gap: 8px;
+  .sk-edit-status {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    margin-left: 8px;
   }
 
   .btn-xs {
@@ -837,9 +934,9 @@ import Footer from '../components/Footer.astro';
   /* ── Responsive ── */
   @media (max-width: 600px) {
     .dash-header { flex-direction: column; align-items: flex-start; }
-    .my-skin-row { flex-direction: column; }
-    .my-skin-preview { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .my-skin-info { padding: 16px; }
+    .sk-top { flex-direction: column; gap: 4px; }
+    .sk-meta { flex-wrap: wrap; }
+    .sk-desc { white-space: normal; }
     .my-widget-row { flex-direction: column; align-items: flex-start; }
   }
 </style>
