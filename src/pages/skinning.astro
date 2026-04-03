@@ -24,6 +24,7 @@ import Footer from '../components/Footer.astro';
             <li><a href="#reactive">Reactive Data</a></li>
             <li><a href="#animations">Animations</a></li>
             <li><a href="#sharing">Sharing</a></li>
+            <li><a href="#preflight">Preflight</a></li>
             <li><a href="#checklist">Checklist</a></li>
           </ol>
         </nav>
@@ -72,7 +73,20 @@ import Footer from '../components/Footer.astro';
           <h3>5. Don't hide the permission dialog</h3>
           <p>These trigger validator warnings: <code>visibility: hidden</code>, <code>opacity: 0</code>, <code>pointer-events: none</code></p>
 
-          <h3>6. Assets stay in <code>assets/</code></h3>
+          <h3>6. No backgrounds on <code>.moltamp-vibes</code></h3>
+          <p>The vibes panel is always transparent. Visual content must come from <strong>GIF widget slots</strong> in <code>skin.json</code>, not CSS <code>background</code>. MOLTamp strips vibes backgrounds at load time.</p>
+
+          <h3>7. Pseudo-elements need <code>pointer-events: none</code></h3>
+          <p>Every <code>::before</code> and <code>::after</code> <strong>must</strong> include <code>pointer-events: none</code>. Without it, they block right-click menus, drag handles, and widget interaction. Auto-fixed at load time, but declare it explicitly.</p>
+          <pre><code>.moltamp-panel-right::before &#123;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--skin-overlay);
+  pointer-events: none;  /* always include this */
+&#125;</code></pre>
+
+          <h3>8. Assets stay in <code>assets/</code></h3>
           <ul>
             <li>Reference with <code>url('./assets/filename.ext')</code></li>
             <li>Supported: PNG, JPG, WebP, GIF, SVG, AVIF</li>
@@ -326,6 +340,28 @@ import Footer from '../components/Footer.astro';
           <p><strong>Import:</strong> Settings &rarr; Skins &rarr; Import — select <code>.moltamp</code> or <code>.zip</code></p>
         </section>
 
+        <!-- Preflight -->
+        <section id="preflight">
+          <h2>Preflight (Auto-Fixes)</h2>
+          <p>MOLTamp applies these overrides <strong>after</strong> your skin CSS loads. They protect users from common mistakes — especially in AI-generated skins.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>What</th><th>Override</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td><code>.moltamp-vibes</code> background</td><td><code>background: transparent !important</code></td><td>Vibes visuals come from GIF widget slots</td></tr>
+                <tr><td>All <code>::before</code> / <code>::after</code></td><td><code>pointer-events: none !important</code></td><td>Pseudo-elements must never block clicks</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>For AI-generated skins</h3>
+          <p>If using ChatGPT, Claude, or another AI to generate a skin, paste this with your prompt:</p>
+          <pre><code>Rules: All colors must be CSS variables in :root.
+Use --skin-* prefix for custom vars.
+Never set background on .moltamp-vibes — use skin.json vibes slots for images.
+Every ::before/::after MUST have pointer-events: none.
+No external URLs, no @import, no JS.</code></pre>
+        </section>
+
         <!-- Checklist -->
         <section id="checklist">
           <h2>Pre-Share Checklist</h2>
@@ -335,9 +371,11 @@ import Footer from '../components/Footer.astro';
             <li>Contract variables (<code>--c-*</code>, <code>--t-*</code>) overridden</li>
             <li>Custom variables use <code>--skin-*</code> prefix</li>
             <li>No <code>background</code> or <code>background-image</code> on <code>.moltamp-vibes</code> (use GIF widget slots)</li>
+            <li>Every <code>::before</code>/<code>::after</code> has <code>pointer-events: none</code></li>
             <li>No external URLs or <code>@import</code></li>
             <li>Assets under 5MB each, 20MB total</li>
             <li>Tested at different panel sizes</li>
+            <li>Right-click context menus work on all panels</li>
             <li>Permission dialog still visible</li>
           </ul>
         </section>
