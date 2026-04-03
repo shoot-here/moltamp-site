@@ -244,13 +244,18 @@ import Footer from '../components/Footer.astro';
       const c = skin.colors;
       const tags = skin.tags?.length ? skin.tags.join(', ') : '';
       return `
-      <div class="sk-card">
-        <div class="sk-accent" style="background:${c.accent}"></div>
+      <div class="sk-card" style="border-color:${c.chromeBorder}">
+        <a href="/skins/view?id=${skin.skin_id}" class="sk-thumb mt-sm" style="background:${c.chromeBg}">
+          <div class="mini-terminal" style="background:${c.chromeBg}">
+            <div class="mt-titlebar" style="border-bottom:1px solid ${c.chromeBorder}"><div class="mt-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div></div>
+            <div class="mt-deck"><div class="mt-term" style="background:${c.background}"><div class="mt-line"><span style="color:${c.green}">$</span><span style="color:${c.foreground}"> _</span></div></div></div>
+            <div class="mt-status" style="border-top:1px solid ${c.chromeBorder};color:${c.chromeDim}"><span class="mt-status-dot" style="background:${c.accent}"></span></div>
+          </div>
+        </a>
         <div class="sk-body">
           <div class="sk-top">
             <a href="/skins/view?id=${skin.skin_id}" class="sk-name" style="color:${c.accent}">${skin.name}</a>
             <div class="sk-meta">
-              <span>${skin.skin_id}</span>
               <span>v${skin.version}</span>
               <span>${skin.download_count} dl</span>
               <span>${(skin.file_size / 1024).toFixed(0)} KB</span>
