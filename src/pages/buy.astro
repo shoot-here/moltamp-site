@@ -18,6 +18,7 @@ import Footer from '../components/Footer.astro';
         <span class="bc-path">moltamp://unlock</span>
       </div>
       <div class="bc-body">
+        <img src="/images/logo.png" alt="" class="bc-logo" width="48" height="48" />
         <h1>Unlock MOLTamp<span class="caret">_</span></h1>
         <p class="bc-sub">One payment. Lifetime license. The nag popup disappears forever.</p>
 
@@ -180,6 +181,15 @@ import Footer from '../components/Footer.astro';
   }
 
   .bc-body { padding: 40px 36px 36px; }
+
+  .bc-logo {
+    display: block;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 12px rgba(255, 80, 40, 0.3));
+  }
 
   .bc-body h1 {
     font-weight: 700;
