@@ -112,7 +112,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
 /**
  * POST /api/skins (multipart form)
- * Upload a .moltamp or .zip skin file. Requires auth.
+ * Upload a .zip skin file. Requires auth.
  * Form fields: file (the skin archive), tags (comma-separated, optional)
  */
 export const onRequestPost: PagesFunction<Env> = async (context) => {

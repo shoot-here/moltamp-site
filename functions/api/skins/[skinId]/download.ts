@@ -1,14 +1,25 @@
+import { getAuthUser } from '../../_shared/auth';
+
 interface Env {
   DB: D1Database;
 }
 
 /**
  * GET /api/skins/:skinId/download
- * Serve .moltamp file from D1 blob. Increments download counter.
+ * Auth required — community downloads are behind the $20 license paywall.
+ * Serve .zip file from D1 blob. Increments download counter.
  */
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const skinId = (context.params as Record<string, string>).skinId;
   const { DB } = context.env;
+
+  const user = await getAuthUser(context.request, DB);
+  if (!user) {
+    return Response.json(
+      { error: 'Login required to download skins. Get a license at moltamp.com/buy' },
+      { status: 401 },
+    );
+  }
 
   const skin = await DB.prepare(
     `SELECT skin_id, file_data, file_size FROM community_skins
@@ -34,7 +45,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   return new Response(skin.file_data, {
     headers: {
       'Content-Type': 'application/zip',
-      'Content-Disposition': `attachment; filename="${skin.skin_id}.moltamp"`,
+      'Content-Disposition': `attachment; filename="${skin.skin_id}.zip"`,
       'Content-Length': String(skin.file_size),
       'X-Content-Type-Options': 'nosniff',
       'Cache-Control': 'public, max-age=3600',

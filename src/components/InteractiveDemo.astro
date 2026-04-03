@@ -1409,31 +1409,41 @@
         bg:'#040810', bgCard:'#0a1420', bgSurface:'#0d1a2a', txt:'#c8e6ff', txtDim:'#4a6a8a',
         accent:'#00ffff', warm:'#ff1493', border:'rgba(0,255,255,0.12)', green:'#00ff41',
         red:'#ff3366', yellow:'#ffaa00', pink:'#ff00aa', panel:'#08001a', panelBorder:'#1a0040',
-        terminal:'#0a0020', glow:'rgba(0,255,255,0.3)', glowWarm:'rgba(255,0,170,0.3)', name:'neon-horizon'
+        terminal:'#0a0020', glow:'rgba(0,255,255,0.3)', glowWarm:'rgba(255,0,170,0.3)', name:'neon-horizon',
+        vibes:'linear-gradient(135deg,#1a0040,#5a0080,#ff1493,#00ffff44,#3d0066,#1a0040)',
+        vibesBorder:'#1a0040'
       },
       'deep-claw': {
         bg:'#0a0800', bgCard:'#141008', bgSurface:'#1a1410', txt:'#ffd4a0', txtDim:'#8a6a4a',
         accent:'#ff6b00', warm:'#ff2266', border:'rgba(255,107,0,0.12)', green:'#ff9900',
         red:'#ff2266', yellow:'#ffcc00', pink:'#ff2266', panel:'#0e0a04', panelBorder:'#3a2810',
-        terminal:'#0c0800', glow:'rgba(255,107,0,0.3)', glowWarm:'rgba(255,34,102,0.3)', name:'deep-claw'
+        terminal:'#0c0800', glow:'rgba(255,107,0,0.3)', glowWarm:'rgba(255,34,102,0.3)', name:'deep-claw',
+        vibes:'linear-gradient(135deg,#1a0800,#4a1500,#ff4400,#ff6b00,#661a00,#1a0800)',
+        vibesBorder:'#3a2810'
       },
       'phosphor': {
         bg:'#040a04', bgCard:'#081408', bgSurface:'#0a1a0a', txt:'#b0ffb0', txtDim:'#3a6a3a',
         accent:'#00ff41', warm:'#00cc33', border:'rgba(0,255,65,0.12)', green:'#00ff41',
         red:'#ff4444', yellow:'#aaff00', pink:'#00ff41', panel:'#040c04', panelBorder:'#0a3a0a',
-        terminal:'#020800', glow:'rgba(0,255,65,0.3)', glowWarm:'rgba(0,204,51,0.3)', name:'phosphor'
+        terminal:'#020800', glow:'rgba(0,255,65,0.3)', glowWarm:'rgba(0,204,51,0.3)', name:'phosphor',
+        vibes:'linear-gradient(135deg,#001a00,#003a00,#00ff41,#00aa22,#004400,#001a00)',
+        vibesBorder:'#0a3a0a'
       },
       'blade-runner': {
         bg:'#0a0604', bgCard:'#141008', bgSurface:'#1a1208', txt:'#ffd080', txtDim:'#7a6040',
         accent:'#ffaa00', warm:'#ff4400', border:'rgba(255,170,0,0.12)', green:'#ffcc00',
         red:'#ff4400', yellow:'#ffaa00', pink:'#ff6600', panel:'#0a0804', panelBorder:'#302010',
-        terminal:'#080400', glow:'rgba(255,170,0,0.3)', glowWarm:'rgba(255,68,0,0.3)', name:'blade-runner'
+        terminal:'#080400', glow:'rgba(255,170,0,0.3)', glowWarm:'rgba(255,68,0,0.3)', name:'blade-runner',
+        vibes:'linear-gradient(135deg,#1a0c00,#4a2000,#ffaa00,#ff6600,#3a1800,#1a0c00)',
+        vibesBorder:'#302010'
       },
       'cold-steel': {
         bg:'#08080c', bgCard:'#10101a', bgSurface:'#141420', txt:'#c0c0e0', txtDim:'#5a5a7a',
         accent:'#8888ff', warm:'#aa88cc', border:'rgba(136,136,255,0.12)', green:'#88ddff',
         red:'#ff6688', yellow:'#ccaaff', pink:'#aa88ff', panel:'#0a0a10', panelBorder:'#20204a',
-        terminal:'#060610', glow:'rgba(136,136,255,0.3)', glowWarm:'rgba(170,136,204,0.3)', name:'cold-steel'
+        terminal:'#060610', glow:'rgba(136,136,255,0.3)', glowWarm:'rgba(170,136,204,0.3)', name:'cold-steel',
+        vibes:'linear-gradient(135deg,#0a0a1a,#2a2a5a,#8888ff,#aa88cc,#1a1a40,#0a0a1a)',
+        vibesBorder:'#20204a'
       }
     };
 
@@ -1472,6 +1482,13 @@
       }
       var skinLabel = root.querySelector('.sb-skin');
       if (skinLabel) skinLabel.textContent = s.name;
+      // Update vibes banner
+      var vibesGrad = root.querySelector('.vibes-gradient');
+      var vibesWrap = root.querySelector('.m-vibes');
+      if (vibesGrad) { vibesGrad.style.background = s.vibes; vibesGrad.style.backgroundSize = '300% 300%'; }
+      if (vibesWrap) vibesWrap.style.borderBottomColor = s.vibesBorder;
+      // Update panel tab borders
+      root.querySelectorAll('.panel-tabs').forEach(function(t) { t.style.borderBottomColor = s.panelBorder; });
     }
 
     function nextSkin() {

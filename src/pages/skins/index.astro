@@ -37,9 +37,10 @@ import Footer from '../../components/Footer.astro';
         <p>No skins found. Be the first to <a href="/dashboard">upload one</a>!</p>
       </div>
 
-      <div class="gallery-cta">
-        <p>Got a skin to share?</p>
-        <a href="/login" class="btn btn-primary" id="cta-btn">Sign in to upload</a>
+      <div class="gallery-cta" id="gallery-cta">
+        <p>Download skins, upload your own, rate and comment.</p>
+        <a href="/buy" class="btn btn-primary" id="cta-btn">Get a License — $20</a>
+        <p class="cta-sub">Already have a key? <a href="/login">Sign in</a></p>
       </div>
     </div>
   </main>
@@ -59,7 +60,11 @@ import Footer from '../../components/Footer.astro';
   const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
   const ctaBtn = document.getElementById('cta-btn') as HTMLAnchorElement;
 
-  fetch('/api/auth/me').then(r => { if (r.ok) { ctaBtn.href = '/dashboard'; ctaBtn.textContent = 'Go to Dashboard'; } });
+  fetch('/api/auth/me').then(r => { if (r.ok) {
+    ctaBtn.href = '/dashboard'; ctaBtn.textContent = 'Go to Dashboard';
+    const sub = document.querySelector('.cta-sub') as HTMLElement;
+    if (sub) sub.style.display = 'none';
+  }});
 
   fetch('/api/skins/tags').then(r => r.json()).then(data => {
     tagChips.innerHTML = data.tags.map((t: {tag:string;count:number}) =>
@@ -152,6 +157,8 @@ import Footer from '../../components/Footer.astro';
   .empty-state { text-align:center; padding:48px 0; color:var(--text-dim); }
   .gallery-cta { text-align:center; margin-top:40px; padding-top:24px; border-top:1px solid var(--border); }
   .gallery-cta p { color:var(--text-dim); margin-bottom:10px; }
+  .cta-sub { font-size:0.82rem; margin-top:10px; }
+  .cta-sub a { color:var(--accent); }
 
   @media (max-width:1100px) { .skins-grid { grid-template-columns:repeat(3,1fr); } }
   @media (max-width:768px) { .skins-grid { grid-template-columns:repeat(2,1fr); } }
