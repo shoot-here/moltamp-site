@@ -24,6 +24,7 @@
       <!-- Vibes Banner -->
       <div class="m-vibes">
         <div class="vibes-gradient"></div>
+        <canvas class="vibes-canvas" id="vibes-canvas"></canvas>
         <div class="vibes-scanlines"></div>
       </div>
 
@@ -555,6 +556,14 @@
   @keyframes vibes-shift {
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
+  }
+
+  .vibes-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 
   .vibes-scanlines {
@@ -1509,6 +1518,246 @@
         startAuto();
       });
     });
+
+    // ── Vibes Canvas Engine ──────────────────────────────────
+    var vibesCanvas = document.getElementById('vibes-canvas');
+    var vCtx = vibesCanvas ? vibesCanvas.getContext('2d') : null;
+    var vibesAnim = null;
+    var vibesParticles = [];
+    var currentVibesEffect = 'neon-horizon';
+
+    function resizeVibesCanvas() {
+      if (!vibesCanvas) return;
+      var rect = vibesCanvas.parentElement.getBoundingClientRect();
+      vibesCanvas.width = rect.width;
+      vibesCanvas.height = rect.height;
+    }
+    resizeVibesCanvas();
+
+    // ── Particle factories ──
+
+    function makeFlameParticles(w, h) {
+      var p = [];
+      for (var i = 0; i < 60; i++) {
+        p.push({
+          x: Math.random() * w,
+          y: h + Math.random() * 20,
+          vy: -(0.3 + Math.random() * 1.2),
+          vx: (Math.random() - 0.5) * 0.4,
+          r: 2 + Math.random() * 4,
+          life: Math.random(),
+          maxLife: 0.6 + Math.random() * 0.4
+        });
+      }
+      return p;
+    }
+
+    function makeMatrixColumns(w) {
+      var cols = Math.floor(w / 10);
+      var p = [];
+      for (var i = 0; i < cols; i++) {
+        p.push({
+          x: i * 10,
+          y: Math.random() * -200,
+          speed: 0.5 + Math.random() * 1.5,
+          chars: [],
+          nextChar: 0
+        });
+        var len = 4 + Math.floor(Math.random() * 8);
+        for (var j = 0; j < len; j++) {
+          p[i].chars.push(String.fromCharCode(0x30A0 + Math.floor(Math.random() * 96)));
+        }
+      }
+      return p;
+    }
+
+    function makeOrbs(w, h) {
+      var p = [];
+      for (var i = 0; i < 20; i++) {
+        p.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.15,
+          r: 3 + Math.random() * 8,
+          pulse: Math.random() * Math.PI * 2
+        });
+      }
+      return p;
+    }
+
+    function makeSparkles(w, h) {
+      var p = [];
+      for (var i = 0; i < 40; i++) {
+        p.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vy: 0.2 + Math.random() * 0.5,
+          vx: (Math.random() - 0.5) * 0.3,
+          r: 1 + Math.random() * 2,
+          twinkle: Math.random() * Math.PI * 2
+        });
+      }
+      return p;
+    }
+
+    function makeStreaks(w, h) {
+      var p = [];
+      for (var i = 0; i < 8; i++) {
+        p.push({
+          x: Math.random() * w * 1.5 - w * 0.25,
+          y: Math.random() * h,
+          speed: 1 + Math.random() * 2,
+          len: 40 + Math.random() * 80,
+          alpha: 0.1 + Math.random() * 0.3
+        });
+      }
+      return p;
+    }
+
+    function initVibes(skinId) {
+      currentVibesEffect = skinId;
+      if (!vibesCanvas) return;
+      var w = vibesCanvas.width;
+      var h = vibesCanvas.height;
+      if (skinId === 'deep-claw') vibesParticles = makeFlameParticles(w, h);
+      else if (skinId === 'phosphor') vibesParticles = makeMatrixColumns(w);
+      else if (skinId === 'blade-runner') vibesParticles = makeOrbs(w, h);
+      else if (skinId === 'cold-steel') vibesParticles = makeSparkles(w, h);
+      else vibesParticles = makeStreaks(w, h);
+    }
+
+    // ── Render functions ──
+
+    function renderFlames(ctx, w, h) {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < vibesParticles.length; i++) {
+        var p = vibesParticles[i];
+        p.x += p.vx + (Math.random() - 0.5) * 0.5;
+        p.y += p.vy;
+        p.life += 0.01;
+        if (p.life > p.maxLife || p.y < -10) {
+          p.x = Math.random() * w;
+          p.y = h + Math.random() * 10;
+          p.life = 0;
+        }
+        var progress = p.life / p.maxLife;
+        var alpha = progress < 0.3 ? progress / 0.3 : 1 - (progress - 0.3) / 0.7;
+        var r = p.r * (1 - progress * 0.5);
+        var grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        if (progress < 0.4) {
+          grad.addColorStop(0, 'rgba(255,200,50,' + (alpha * 0.8) + ')');
+          grad.addColorStop(1, 'rgba(255,80,0,0)');
+        } else {
+          grad.addColorStop(0, 'rgba(255,60,0,' + (alpha * 0.6) + ')');
+          grad.addColorStop(1, 'rgba(180,0,0,0)');
+        }
+        ctx.fillStyle = grad;
+        ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+      }
+    }
+
+    function renderMatrix(ctx, w, h) {
+      ctx.fillStyle = 'rgba(4,10,4,0.15)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.font = '10px monospace';
+      for (var i = 0; i < vibesParticles.length; i++) {
+        var col = vibesParticles[i];
+        col.y += col.speed;
+        var charIdx = Math.floor(col.y / 12) % col.chars.length;
+        for (var j = 0; j < col.chars.length; j++) {
+          var cy = col.y - j * 12;
+          if (cy < -12 || cy > h + 12) continue;
+          var fade = j === 0 ? 1 : Math.max(0, 1 - j / col.chars.length);
+          ctx.fillStyle = j === 0 ? 'rgba(150,255,150,' + fade + ')' : 'rgba(0,255,65,' + (fade * 0.5) + ')';
+          ctx.fillText(col.chars[(charIdx + j) % col.chars.length], col.x, cy);
+        }
+        if (col.y - col.chars.length * 12 > h) {
+          col.y = -Math.random() * 100;
+          col.speed = 0.5 + Math.random() * 1.5;
+        }
+      }
+    }
+
+    function renderOrbs(ctx, w, h) {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < vibesParticles.length; i++) {
+        var p = vibesParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.pulse += 0.02;
+        if (p.x < -20) p.x = w + 20;
+        if (p.x > w + 20) p.x = -20;
+        if (p.y < -20) p.y = h + 20;
+        if (p.y > h + 20) p.y = -20;
+        var glow = 0.3 + Math.sin(p.pulse) * 0.2;
+        var r = p.r + Math.sin(p.pulse) * 2;
+        var grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0, 'rgba(255,170,0,' + glow + ')');
+        grad.addColorStop(0.5, 'rgba(255,100,0,' + (glow * 0.4) + ')');
+        grad.addColorStop(1, 'rgba(255,68,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(p.x - r * 2, p.y - r * 2, r * 4, r * 4);
+      }
+    }
+
+    function renderSparkles(ctx, w, h) {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < vibesParticles.length; i++) {
+        var p = vibesParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.twinkle += 0.05;
+        if (p.y > h + 5) { p.y = -5; p.x = Math.random() * w; }
+        var alpha = 0.3 + Math.sin(p.twinkle) * 0.3;
+        ctx.fillStyle = 'rgba(180,180,255,' + alpha + ')';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function renderStreaks(ctx, w, h) {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < vibesParticles.length; i++) {
+        var p = vibesParticles[i];
+        p.x += p.speed;
+        if (p.x - p.len > w * 1.5) { p.x = -p.len - Math.random() * w * 0.5; p.y = Math.random() * h; }
+        var grad = ctx.createLinearGradient(p.x - p.len, p.y, p.x, p.y);
+        grad.addColorStop(0, 'rgba(0,255,255,0)');
+        grad.addColorStop(0.5, 'rgba(0,255,255,' + p.alpha + ')');
+        grad.addColorStop(1, 'rgba(255,0,170,' + (p.alpha * 0.5) + ')');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(p.x - p.len, p.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+    }
+
+    function vibesTick() {
+      if (!vCtx || !vibesCanvas) return;
+      var w = vibesCanvas.width;
+      var h = vibesCanvas.height;
+      if (currentVibesEffect === 'deep-claw') renderFlames(vCtx, w, h);
+      else if (currentVibesEffect === 'phosphor') renderMatrix(vCtx, w, h);
+      else if (currentVibesEffect === 'blade-runner') renderOrbs(vCtx, w, h);
+      else if (currentVibesEffect === 'cold-steel') renderSparkles(vCtx, w, h);
+      else renderStreaks(vCtx, w, h);
+      vibesAnim = requestAnimationFrame(vibesTick);
+    }
+
+    initVibes('neon-horizon');
+    vibesTick();
+
+    // Patch applySkin to also switch vibes effect
+    var origApplySkin = applySkin;
+    applySkin = function(id) {
+      origApplySkin(id);
+      resizeVibesCanvas();
+      initVibes(id);
+    };
 
     // Pause on hover
     root.addEventListener('mouseenter', function() { paused = true; });
