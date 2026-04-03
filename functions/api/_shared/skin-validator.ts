@@ -164,6 +164,9 @@ export function validateAssets(
 
     const relativePath = path.slice('assets/'.length);
 
+    // Skip directory entries (trailing slash or empty name)
+    if (!relativePath || path.endsWith('/')) continue;
+
     // No nested directories
     if (relativePath.includes('/')) {
       errors.push(`Nested directory in assets: ${path}`);

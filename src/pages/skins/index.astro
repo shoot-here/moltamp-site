@@ -25,6 +25,7 @@ import Footer from '../../components/Footer.astro';
           <select id="sort-select" class="sort-select">
             <option value="newest">Newest</option>
             <option value="popular">Most Popular</option>
+            <option value="top-rated">Top Rated</option>
             <option value="updated">Recently Updated</option>
           </select>
         </div>
@@ -131,14 +132,16 @@ import Footer from '../../components/Footer.astro';
   .skin-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.4); color:inherit; }
 
   /* Name overlay */
-  .skin-card-overlay { position:absolute; bottom:0; left:0; right:0; padding:20px 10px 6px; pointer-events:none; transition:opacity var(--transition-fast); }
+  .skin-card-overlay { position:absolute; bottom:0; left:0; right:0; padding:20px 10px 6px; pointer-events:none; transition:opacity var(--transition-fast); display:flex; align-items:center; justify-content:space-between; }
   .skin-card-name { font-size:0.78rem; font-weight:600; }
+  .skin-card-stars { display:flex; align-items:center; gap:1px; }
 
   /* Hover overlay */
   .skin-card-hover { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; transition:opacity var(--transition-fast); font-size:0.75rem; }
   .skin-card:hover .skin-card-hover { opacity:1; }
   .skin-card:hover .skin-card-overlay { opacity:0; }
   .hover-author { font-weight:500; }
+  .hover-stars { display:flex; align-items:center; gap:1px; }
   .hover-downloads { font-size:0.65rem; }
 
   .pagination { display:flex; justify-content:center; gap:6px; margin-top:24px; }

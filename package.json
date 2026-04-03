@@ -7,8 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "db:migrate": "wrangler d1 execute moltamp-db --local --file=migrations/0001_init.sql && wrangler d1 execute moltamp-db --local --file=migrations/0002_community_skins.sql && wrangler d1 execute moltamp-db --local --file=migrations/0003_phase2.sql",
-    "db:migrate:prod": "wrangler d1 execute moltamp-db --file=migrations/0001_init.sql && wrangler d1 execute moltamp-db --file=migrations/0002_community_skins.sql && wrangler d1 execute moltamp-db --file=migrations/0003_phase2.sql"
+    "db:migrate": "wrangler d1 execute moltamp-db --local --file=migrations/0001_init.sql && wrangler d1 execute moltamp-db --local --file=migrations/0002_community_skins.sql && wrangler d1 execute moltamp-db --local --file=migrations/0003_phase2.sql && wrangler d1 execute moltamp-db --local --file=migrations/0004_ratings.sql",
+    "db:migrate:prod": "wrangler d1 execute moltamp-db --file=migrations/0001_init.sql && wrangler d1 execute moltamp-db --file=migrations/0002_community_skins.sql && wrangler d1 execute moltamp-db --file=migrations/0003_phase2.sql && wrangler d1 execute moltamp-db --file=migrations/0004_ratings.sql"
   },
   "repository": {
     "type": "git",

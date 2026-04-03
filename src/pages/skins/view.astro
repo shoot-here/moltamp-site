@@ -23,6 +23,46 @@ import Footer from '../../components/Footer.astro';
 
   fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d) currentUser = d.user; });
 
+  function starSvg(filled: boolean) {
+    return `<svg width="18" height="18" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  }
+
+  function renderStars(avg: number, count: number, userRating: number | null, interactive: boolean) {
+    const rounded = Math.round(avg);
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+      const filled = i <= rounded;
+      const userFilled = userRating ? i <= userRating : false;
+      const cls = interactive ? `star-btn${userFilled ? ' rated' : ''}` : 'star-static';
+      stars += `<span class="${cls}" data-v="${i}" style="cursor:${interactive ? 'pointer' : 'default'};color:${(interactive ? userFilled : filled) ? '#fbbf24' : 'var(--text-dim)'};display:inline-flex;vertical-align:middle;">${starSvg(interactive ? userFilled : filled)}</span>`;
+    }
+    const label = count > 0 ? `<span style="color:var(--text-dim);font-size:0.82rem;margin-left:6px;vertical-align:middle;">${avg} (${count})</span>` : `<span style="color:var(--text-dim);font-size:0.82rem;margin-left:6px;vertical-align:middle;">No ratings yet</span>`;
+    return `<div class="d-stars" id="d-stars">${stars}${label}</div>`;
+  }
+
+  async function submitRating(value: number) {
+    const res = await fetch(`/api/skins/${skinId}/ratings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: value }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      const starsEl = document.getElementById('d-stars');
+      if (starsEl) starsEl.outerHTML = renderStars(data.avg_rating, data.rating_count, data.user_rating, true);
+      bindStarClicks();
+    }
+  }
+
+  function bindStarClicks() {
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = parseInt((btn as HTMLElement).dataset.v!);
+        submitRating(v);
+      });
+    });
+  }
+
   async function load() {
     if (!skinId) return;
     const res = await fetch(`/api/skins/${skinId}`);
@@ -46,7 +86,7 @@ import Footer from '../../components/Footer.astro';
       </div>`;
     }
 
-    // Build swatches as inline HTML
+    // Build swatches
     const ansi = [c.black,c.red,c.green,c.yellow,c.blue,c.magenta,c.cyan,c.white];
     const bright = [c.brightBlack,c.brightRed,c.brightGreen,c.brightYellow,c.brightBlue,c.brightMagenta,c.brightCyan,c.brightWhite];
     const chromeVals = [c.chromeBg, c.chromeText||c.chromeDim, c.chromeBorder, c.accent, c.chromeDim, c.chromeHover||c.chromeBg];
@@ -60,59 +100,80 @@ import Footer from '../../components/Footer.astro';
     if (c.glow) effects.push('Glow');
     if (c.crt) effects.push('CRT');
 
-    const tags = skin.tags?.length ? skin.tags.map((t:string) => `<a href="/skins?tag=${t}" class="dtag">${t}</a>`).join('') : '';
+    const tags = skin.tags?.length ? skin.tags.map((t:string) => `<a href="/skins?tag=${t}" style="display:inline-block;padding:4px 12px;font-size:0.78rem;border-radius:100px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);text-decoration:none;margin:0 4px 4px 0;">${t}</a>`).join('') : '';
     const size = (skin.file_size / 1024).toFixed(0);
 
-    container.innerHTML = `
-      <a href="/skins" class="back">← Gallery</a>
+    // Ratings — fetch separately for user-specific data
+    let ratingsHtml = renderStars(skin.avg_rating || 0, skin.rating_count || 0, null, false);
 
-      <div class="d-top">
-        <div class="d-top-info">
-          <h1 style="color:${c.accent}">${skin.name}</h1>
-          <p class="d-byline">by <a href="/skins/author?name=${encodeURIComponent(skin.author_name)}">${skin.author_name}</a> · v${skin.version} · ${skin.download_count} download${skin.download_count!==1?'s':''} · ${size} KB</p>
+    container.innerHTML = `
+      <a href="/skins" style="display:inline-block;color:var(--text-secondary);font-size:0.85rem;margin-bottom:24px;text-decoration:none;">← Gallery</a>
+
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:8px;">
+        <div>
+          <h1 style="font-size:clamp(1.5rem,4vw,2.2rem);margin-bottom:4px;color:${c.accent}">${skin.name}</h1>
+          <p style="color:var(--text-dim);font-size:0.88rem;">by <a href="/skins/author?name=${encodeURIComponent(skin.author_name)}" style="color:var(--accent);text-decoration:none;">${skin.author_name}</a> · v${skin.version} · ${skin.download_count} download${skin.download_count!==1?'s':''} · ${size} KB</p>
         </div>
-        <a href="/api/skins/${skinId}/download" class="btn btn-primary d-dl-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <a href="/api/skins/${skinId}/download" style="flex-shrink:0;" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download
         </a>
       </div>
 
+      <div style="margin-bottom:24px;" id="ratings-area">${ratingsHtml}</div>
+
       ${heroHtml}
 
-      <div class="d-content">
-        <p class="d-desc">${skin.description}</p>
+      <div style="max-width:800px;margin-bottom:40px;">
+        <p style="color:var(--text-secondary);font-size:1rem;line-height:1.7;margin-bottom:20px;">${skin.description}</p>
 
-        <div class="d-meta-row">
-          ${tags ? `<div class="d-tags">${tags}</div>` : ''}
-          ${effects.length ? `<div class="d-effects">${effects.map(e => `<span class="d-effect">${e}</span>`).join('')}</div>` : ''}
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:24px;">
+          ${tags ? `<div>${tags}</div>` : ''}
+          ${effects.length ? `<div style="display:flex;gap:8px;">${effects.map(e => `<span style="display:inline-block;padding:4px 12px;font-size:0.75rem;font-family:var(--font-mono);border-radius:var(--radius-sm);background:var(--accent-subtle);color:var(--accent);border:1px solid var(--accent-glow);">${e}</span>`).join('')}</div>` : ''}
         </div>
 
-        <div class="d-palette card">
-          <h3>Terminal Colors</h3>
-          <div class="d-swatch-block">${swatches(ansi)}</div>
-          <div class="d-swatch-block">${swatches(bright)}</div>
-          <h3>Chrome</h3>
-          <div class="d-swatch-block">${swatches(chromeVals)}</div>
+        <div class="card" style="padding:20px 24px;margin-bottom:20px;">
+          <h3 style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;font-weight:500;">Terminal Colors</h3>
+          <div style="margin-bottom:4px;line-height:0;">${swatches(ansi)}</div>
+          <div style="margin-bottom:4px;line-height:0;">${swatches(bright)}</div>
+          <h3 style="font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;margin-top:16px;font-weight:500;">Chrome</h3>
+          <div style="line-height:0;">${swatches(chromeVals)}</div>
         </div>
 
-        <div class="d-install card">
-          <h3>Install</h3>
-          <ol>
-            <li>Download the <code>.moltamp</code> file above</li>
-            <li>Open MOLTamp → Settings → Skins</li>
-            <li>Click <strong>Import</strong> and select the file</li>
+        <div class="card" style="padding:20px 24px;">
+          <h3 style="font-size:0.82rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Install</h3>
+          <ol style="padding-left:20px;color:var(--text-secondary);font-size:0.9rem;">
+            <li style="padding:4px 0;">Download the <code style="font-family:var(--font-mono);background:var(--bg-secondary);padding:2px 6px;border-radius:3px;font-size:0.85em;">.moltamp</code> file above</li>
+            <li style="padding:4px 0;">Open MOLTamp → Settings → Skins</li>
+            <li style="padding:4px 0;">Click <strong>Import</strong> and select the file</li>
           </ol>
         </div>
       </div>
 
-      <div class="d-comments" id="d-comments">
-        <h2>Comments</h2>
+      <div style="border-top:1px solid var(--border);padding-top:32px;max-width:800px;">
+        <h2 style="font-size:1.2rem;margin-bottom:20px;">Comments</h2>
         <div id="cform"></div>
         <div id="clist">Loading comments...</div>
       </div>
     `;
 
+    // Load ratings with user-specific data
+    loadRatings();
     loadComments();
+    bindStarClicks();
+  }
+
+  async function loadRatings() {
+    try {
+      const res = await fetch(`/api/skins/${skinId}/ratings`);
+      const data = await res.json();
+      const area = document.getElementById('ratings-area');
+      if (area) {
+        const interactive = currentUser !== null;
+        area.innerHTML = renderStars(data.avg_rating, data.rating_count, data.user_rating, interactive);
+        bindStarClicks();
+      }
+    } catch {}
   }
 
   function renderMini(skin: any) {
@@ -139,10 +200,10 @@ import Footer from '../../components/Footer.astro';
 
     if (currentUser) {
       cform.innerHTML = `
-        <form id="cf" class="comment-form">
-          <textarea id="ct" placeholder="Leave a comment..." maxlength="500" rows="3"></textarea>
-          <div class="cf-row"><span class="cf-count" id="cc">0/500</span><button type="submit" class="btn btn-primary btn-sm">Post</button></div>
-          <p class="cf-err" id="cerr"></p>
+        <form id="cf" style="margin-bottom:20px;">
+          <textarea id="ct" placeholder="Leave a comment..." maxlength="500" rows="3" style="width:100%;padding:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:0.9rem;resize:vertical;outline:none;font-family:var(--font-display);"></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;"><span style="font-size:0.75rem;color:var(--text-dim);" id="cc">0/500</span><button type="submit" class="btn btn-primary" style="padding:8px 18px;font-size:0.82rem;">Post</button></div>
+          <p style="color:#ef4444;font-size:0.82rem;margin-top:6px;" id="cerr"></p>
         </form>`;
       const ta = document.getElementById('ct') as HTMLTextAreaElement;
       ta.addEventListener('input', () => { document.getElementById('cc')!.textContent = `${ta.value.length}/500`; });
@@ -156,21 +217,21 @@ import Footer from '../../components/Footer.astro';
         else document.getElementById('cerr')!.textContent = d.error || 'Failed';
       });
     } else {
-      cform.innerHTML = `<p class="cf-signin"><a href="/login">Sign in</a> to leave a comment.</p>`;
+      cform.innerHTML = `<p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:20px;"><a href="/login" style="color:var(--accent);">Sign in</a> to leave a comment.</p>`;
     }
 
     const res = await fetch(`/api/skins/${skinId}/comments?limit=50`);
     const data = await res.json();
     if (data.comments.length === 0) {
-      clist.innerHTML = '<p class="cf-empty">No comments yet. Be the first!</p>';
+      clist.innerHTML = '<p style="color:var(--text-dim);font-size:0.9rem;">No comments yet. Be the first!</p>';
     } else {
       clist.innerHTML = data.comments.map((c:any) => `
-        <div class="comment-item">
-          <div class="comment-head">
-            <strong>${c.author}</strong>
-            <span class="comment-date">${new Date(c.created_at).toLocaleDateString()}</span>
+        <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;gap:10px;align-items:baseline;margin-bottom:6px;">
+            <strong style="color:var(--text-primary);font-size:0.9rem;">${c.author}</strong>
+            <span style="color:var(--text-dim);font-size:0.75rem;">${new Date(c.created_at).toLocaleDateString()}</span>
           </div>
-          <p class="comment-body">${c.comment}</p>
+          <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6;">${c.comment}</p>
         </div>`).join('');
     }
   }
@@ -181,78 +242,9 @@ import Footer from '../../components/Footer.astro';
 <style>
   .detail-page { padding: calc(var(--nav-height) + 40px) 0 80px; }
   .detail-loading, .not-found { text-align: center; padding: 80px 0; color: var(--text-dim); font-size: 1rem; }
-
-  .back { display: inline-block; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px; }
-  .back:hover { color: var(--accent); }
-
-  /* Top bar: title + download */
-  .d-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
-  .d-top h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin-bottom: 4px; }
-  .d-byline { color: var(--text-dim); font-size: 0.88rem; }
-  .d-byline a { color: var(--accent); }
-  .d-dl-btn { flex-shrink: 0; }
-
-  /* Hero */
   .hero-screenshots { margin-bottom: 32px; }
   .hero-img { width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border); }
   .hero-mini { margin-bottom: 32px; }
-
-  /* Content */
-  .d-content { max-width: 800px; margin-bottom: 40px; }
-
-  .d-desc { color: var(--text-secondary); font-size: 1rem; line-height: 1.7; margin-bottom: 20px; }
-
-  .d-meta-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
-  .d-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-  .dtag { padding: 4px 12px; font-size: 0.78rem; border-radius: 100px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); text-decoration: none; }
-  .dtag:hover { border-color: var(--accent); color: var(--accent); }
-  .d-effects { display: flex; gap: 8px; }
-  .d-effect { padding: 4px 12px; font-size: 0.75rem; font-family: var(--font-mono); border-radius: var(--radius-sm); background: var(--accent-subtle); color: var(--accent); border: 1px solid var(--accent-glow); }
-
-  /* Palette — inline-block swatches, no flexbox issues */
-  .d-palette { padding: 20px 24px; margin-bottom: 20px; }
-  .d-palette h3 { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; margin-top: 16px; font-weight: 500; }
-  .d-palette h3:first-child { margin-top: 0; }
-  .d-swatch-block { margin-bottom: 4px; line-height: 0; }
-
-  /* Install */
-  .d-install { padding: 20px 24px; margin-bottom: 0; }
-  .d-install h3 { font-size: 0.82rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
-  .d-install ol { padding-left: 20px; color: var(--text-secondary); font-size: 0.9rem; }
-  .d-install li { padding: 4px 0; }
-  .d-install code { font-family: var(--font-mono); background: var(--bg-secondary); padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
-
-  /* Comments */
-  .d-comments { border-top: 1px solid var(--border); padding-top: 32px; max-width: 800px; }
-  .d-comments h2 { font-size: 1.2rem; margin-bottom: 20px; }
-
-  .comment-form textarea {
-    width: 100%;
-    padding: 14px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    resize: vertical;
-    outline: none;
-    font-family: var(--font-display);
-  }
-  .comment-form textarea:focus { border-color: var(--accent); }
-  .cf-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-  .cf-count { font-size: 0.75rem; color: var(--text-dim); }
-  .cf-err { color: #ef4444; font-size: 0.82rem; margin-top: 6px; }
-  .cf-signin { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 20px; }
-  .cf-empty { color: var(--text-dim); font-size: 0.9rem; }
-
-  .comment-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
-  .comment-item:last-child { border-bottom: none; }
-  .comment-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 6px; }
-  .comment-head strong { color: var(--text-primary); font-size: 0.9rem; }
-  .comment-date { color: var(--text-dim); font-size: 0.75rem; }
-  .comment-body { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
-
-  .btn-sm { padding: 8px 18px; font-size: 0.82rem; }
 
   @media (max-width: 600px) {
     .d-top { flex-direction: column; }

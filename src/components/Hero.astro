@@ -1,4 +1,5 @@
 ---
+import InteractiveDemo from './InteractiveDemo.astro';
 ---
 
 <section class="hero">
@@ -42,41 +43,9 @@
       </div>
     </div>
 
-    <!-- Video / demo area — swap src when video is ready -->
+    <!-- Interactive app demo -->
     <div class="hero-demo fade-in">
-      <div class="glow-border">
-        <div class="demo-container">
-          <div class="demo-chrome">
-            <div class="ph-dot"></div>
-            <div class="ph-dot"></div>
-            <div class="ph-dot"></div>
-            <span class="ph-title">MOLTamp</span>
-          </div>
-          <div class="demo-body">
-            <div class="ph-sidebar">
-              <div class="ph-block" style="height: 40px; opacity: 0.3;"></div>
-              <div class="ph-block" style="height: 60px; opacity: 0.2;"></div>
-              <div class="ph-block" style="height: 40px; opacity: 0.15;"></div>
-            </div>
-            <div class="ph-terminal">
-              <div class="ph-line"><span class="ph-prompt">&gt;</span> claude --skin cyberdeck</div>
-              <div class="ph-line ph-dim">Panels loaded. Music playing. Vibes immaculate.</div>
-              <div class="ph-line ph-dim">TypeCat is watching you type.</div>
-              <div class="ph-line"><span class="ph-cursor">_</span></div>
-            </div>
-            <div class="ph-sidebar-right">
-              <div class="ph-block" style="height: 80px; opacity: 0.25;"></div>
-              <div class="ph-block" style="height: 50px; opacity: 0.2;"></div>
-            </div>
-          </div>
-          <div class="demo-status">
-            <span>cyberdeck</span>
-            <span>~/projects</span>
-            <span>opus 4.6</span>
-          </div>
-        </div>
-      </div>
-      <p class="demo-caption">Demo video coming soon</p>
+      <InteractiveDemo />
     </div>
   </div>
 </section>
@@ -191,119 +160,5 @@
     margin-top: 64px;
     position: relative;
     z-index: 1;
-  }
-
-  .demo-container {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .demo-chrome {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .ph-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--border-hover);
-  }
-
-  .ph-title {
-    margin-left: 12px;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-dim);
-  }
-
-  .demo-body {
-    display: grid;
-    grid-template-columns: 160px 1fr 140px;
-    min-height: 340px;
-    gap: 0;
-  }
-
-  .ph-sidebar, .ph-sidebar-right {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    border-right: 1px solid var(--border);
-  }
-
-  .ph-sidebar-right {
-    border-right: none;
-    border-left: 1px solid var(--border);
-  }
-
-  .ph-block {
-    background: var(--accent);
-    border-radius: var(--radius-sm);
-  }
-
-  .ph-terminal {
-    padding: 24px;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    line-height: 2;
-  }
-
-  .ph-line {
-    color: var(--text-primary);
-  }
-
-  .ph-dim {
-    color: var(--text-dim);
-  }
-
-  .ph-prompt {
-    color: var(--accent);
-    margin-right: 8px;
-  }
-
-  .ph-cursor {
-    color: var(--accent);
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  .demo-status {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 16px;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    background: var(--bg-card);
-    border-top: 1px solid var(--border);
-  }
-
-  .demo-caption {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 0.82rem;
-    color: var(--text-dim);
-    font-style: italic;
-  }
-
-  @media (max-width: 768px) {
-    .demo-body {
-      grid-template-columns: 1fr;
-    }
-
-    .ph-sidebar, .ph-sidebar-right {
-      display: none;
-    }
   }
 </style>

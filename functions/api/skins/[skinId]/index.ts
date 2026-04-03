@@ -18,7 +18,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     `SELECT cs.skin_id, cs.name, cs.version, cs.author_name, cs.description,
             cs.colors_json, cs.download_count, cs.file_size, cs.css_size,
             cs.asset_count, cs.created_at, cs.updated_at,
-            GROUP_CONCAT(st.tag) as tags
+            GROUP_CONCAT(st.tag) as tags,
+            (SELECT ROUND(AVG(sr.rating), 1) FROM skin_ratings sr WHERE sr.skin_id = cs.id) as avg_rating,
+            (SELECT COUNT(*) FROM skin_ratings sr WHERE sr.skin_id = cs.id) as rating_count
      FROM community_skins cs
      LEFT JOIN skin_tags st ON st.skin_id = cs.id
      WHERE cs.skin_id = ? AND cs.status = 'active'
@@ -43,6 +45,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       file_size: row.file_size,
       css_size: row.css_size,
       asset_count: row.asset_count,
+      avg_rating: row.avg_rating ?? 0,
+      rating_count: row.rating_count ?? 0,
       created_at: row.created_at,
       updated_at: row.updated_at,
     },

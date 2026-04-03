@@ -220,12 +220,16 @@ import Footer from '../components/Footer.astro';
         <section id="vibes">
           <h2>The Vibes Panel</h2>
           <p>The <code>.moltamp-vibes</code> div is your hero canvas.</p>
-          <pre><code>.moltamp-vibes &#123;
-  min-height: 60px;
-  background-image: url('./assets/vibes.gif');
-  background-size: cover;
+          <p><strong>Backgrounds are not allowed</strong> on <code>.moltamp-vibes</code>. The vibes panel is always transparent — all visual content (GIFs, images) must come from <strong>GIF widget slots</strong> defined in <code>skin.json</code>, not from CSS <code>background</code> or <code>background-image</code>. MOLTamp enforces this with an <code>!important</code> override at load time.</p>
+          <pre><code>// skin.json
+&#123;
+  "vibes": &#123;
+    "slots": [
+      &#123; "widgetId": "gif", "gifSrc": "assets/vibes.gif", "gifFit": "cover" &#125;
+    ]
+  &#125;
 &#125;</code></pre>
-          <p>Use <code>::before</code> and <code>::after</code> for overlays:</p>
+          <p>Use <code>::before</code> and <code>::after</code> for overlay effects — these are still allowed:</p>
           <pre><code>.moltamp-vibes::before &#123;
   content: '';
   position: absolute;
@@ -330,6 +334,7 @@ import Footer from '../components/Footer.astro';
             <li>Zero hardcoded hex/rgb outside <code>:root</code></li>
             <li>Contract variables (<code>--c-*</code>, <code>--t-*</code>) overridden</li>
             <li>Custom variables use <code>--skin-*</code> prefix</li>
+            <li>No <code>background</code> or <code>background-image</code> on <code>.moltamp-vibes</code> (use GIF widget slots)</li>
             <li>No external URLs or <code>@import</code></li>
             <li>Assets under 5MB each, 20MB total</li>
             <li>Tested at different panel sizes</li>

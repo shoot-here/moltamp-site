@@ -55,9 +55,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const orderBy =
     sort === 'popular'
       ? 'cs.download_count DESC'
-      : sort === 'updated'
-        ? 'cs.updated_at DESC'
-        : 'cs.created_at DESC';
+      : sort === 'top-rated'
+        ? 'avg_rating DESC NULLS LAST, rating_count DESC'
+        : sort === 'updated'
+          ? 'cs.updated_at DESC'
+          : 'cs.created_at DESC';
 
   const countResult = await DB.prepare(
     `SELECT COUNT(*) as total FROM community_skins cs ${where}`,
@@ -68,7 +70,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const rows = await DB.prepare(
     `SELECT cs.skin_id, cs.name, cs.version, cs.author_name, cs.description,
             cs.colors_json, cs.download_count, cs.file_size, cs.created_at, cs.updated_at,
-            GROUP_CONCAT(st.tag) as tags
+            GROUP_CONCAT(st.tag) as tags,
+            (SELECT ROUND(AVG(sr.rating), 1) FROM skin_ratings sr WHERE sr.skin_id = cs.id) as avg_rating,
+            (SELECT COUNT(*) FROM skin_ratings sr WHERE sr.skin_id = cs.id) as rating_count
      FROM community_skins cs
      LEFT JOIN skin_tags st ON st.skin_id = cs.id
      ${where}
@@ -89,6 +93,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     tags: row.tags ? (row.tags as string).split(',') : [],
     download_count: row.download_count,
     file_size: row.file_size,
+    avg_rating: row.avg_rating ?? 0,
+    rating_count: row.rating_count ?? 0,
     created_at: row.created_at,
     updated_at: row.updated_at,
   }));

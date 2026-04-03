@@ -212,8 +212,13 @@ import Footer from '../components/Footer.astro';
             </div>
             <div class="my-skin-actions">
               <a href="/skins/view?id=${skin.skin_id}" class="btn btn-secondary btn-sm">View</a>
+              <label class="btn btn-secondary btn-sm ss-upload-btn">
+                Screenshots
+                <input type="file" accept="image/png,image/jpeg,image/webp" multiple data-skin-id="${skin.skin_id}" class="ss-file-input" style="display:none" />
+              </label>
               <button class="btn btn-secondary btn-sm delete-btn" data-skin-id="${skin.skin_id}">Delete</button>
             </div>
+            <p class="ss-status" id="ss-status-${skin.skin_id}" style="font-size:0.75rem;margin-top:6px;min-height:1em;"></p>
           </div>
         </div>
       </div>`;
@@ -226,6 +231,41 @@ import Footer from '../components/Footer.astro';
 
         const res = await fetch(`/api/skins/${skinId}`, { method: 'DELETE' });
         if (res.ok) loadMySkins();
+      });
+    });
+
+    // Screenshot upload
+    container.querySelectorAll('.ss-file-input').forEach(input => {
+      input.addEventListener('change', async () => {
+        const fileInput = input as HTMLInputElement;
+        const skinId = fileInput.dataset.skinId!;
+        const statusEl = document.getElementById(`ss-status-${skinId}`);
+        const files = fileInput.files;
+        if (!files || files.length === 0) return;
+        if (files.length > 3) {
+          if (statusEl) { statusEl.style.color = '#ef4444'; statusEl.textContent = 'Max 3 screenshots'; }
+          return;
+        }
+
+        if (statusEl) { statusEl.style.color = 'var(--text-dim)'; statusEl.textContent = 'Uploading...'; }
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+          formData.append('file', files[i]);
+        }
+
+        try {
+          const res = await fetch(`/api/skins/${skinId}/screenshots`, { method: 'POST', body: formData });
+          const data = await res.json();
+          if (data.success) {
+            if (statusEl) { statusEl.style.color = 'var(--color-success)'; statusEl.textContent = `${data.count} screenshot${data.count !== 1 ? 's' : ''} uploaded`; }
+          } else {
+            if (statusEl) { statusEl.style.color = '#ef4444'; statusEl.textContent = data.error || 'Upload failed'; }
+          }
+        } catch {
+          if (statusEl) { statusEl.style.color = '#ef4444'; statusEl.textContent = 'Upload failed'; }
+        }
+        fileInput.value = '';
       });
     });
   }

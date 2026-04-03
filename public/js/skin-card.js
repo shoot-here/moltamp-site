@@ -6,7 +6,19 @@
 
 function renderSkinCard(skin) {
   const c = skin.colors;
-  const screenshotUrl = `/api/skins/${skin.skin_id}/screenshots/0`;
+
+  // Star rating display
+  const avg = skin.avg_rating || 0;
+  const count = skin.rating_count || 0;
+  const rounded = Math.round(avg);
+  let starsHtml = '';
+  if (count > 0) {
+    for (let i = 1; i <= 5; i++) {
+      const filled = i <= rounded;
+      starsHtml += `<svg width="10" height="10" viewBox="0 0 24 24" fill="${filled ? '#fbbf24' : 'none'}" stroke="#fbbf24" stroke-width="2" style="vertical-align:middle;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    }
+    starsHtml += `<span style="font-size:0.6rem;margin-left:2px;opacity:0.8;">${avg}</span>`;
+  }
 
   return `
   <a href="/skins/view?id=${skin.skin_id}" class="skin-card mt-sm" style="background:${c.chromeBg};border-color:${c.chromeBorder}">
@@ -55,9 +67,11 @@ function renderSkinCard(skin) {
     </div>
     <div class="skin-card-overlay" style="background:linear-gradient(transparent 40%, ${c.chromeBg}ee 100%)">
       <span class="skin-card-name" style="color:${c.accent}">${skin.name}</span>
+      ${starsHtml ? `<span class="skin-card-stars">${starsHtml}</span>` : ''}
     </div>
     <div class="skin-card-hover" style="background:${c.chromeBg}dd">
       <span class="hover-author" style="color:${c.chromeText || c.chromeDim}">by ${skin.author_name}</span>
+      ${starsHtml ? `<span class="hover-stars">${starsHtml}</span>` : ''}
       <span class="hover-downloads" style="color:${c.chromeDim}">${skin.download_count > 0 ? skin.download_count + ' downloads' : 'New'}</span>
     </div>
   </a>`;
