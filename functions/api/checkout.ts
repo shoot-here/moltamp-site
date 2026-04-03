@@ -30,7 +30,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     customer_email: email,
     line_items: [
       {
-        price: STRIPE_PRICE_ID, // Create this in Stripe dashboard: $10 one-time
+        price: STRIPE_PRICE_ID, // Create this in Stripe dashboard: $20 one-time
         quantity: 1,
       },
     ],

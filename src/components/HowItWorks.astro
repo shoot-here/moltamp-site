@@ -14,7 +14,7 @@ const steps = [
   },
   {
     number: '03',
-    title: 'Unlock for $10',
+    title: 'Unlock for $20',
     description: 'One payment. The popup dies forever. You get a license key, paste it in, and never think about it again.',
     detail: 'No subscriptions. No upsells. Just vibes.',
   },
@@ -23,15 +23,15 @@ const steps = [
 
 <section class="section how-section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header fade-in">
       <span class="badge">How it works</span>
       <h2>Free forever. Pay to shut the popup up.</h2>
-      <p>The full app is free. The $10 just makes the nag go away and tells me you think this is cool.</p>
+      <p>The full app is free. The $20 just makes the nag go away and tells me you think this is cool.</p>
     </div>
 
     <div class="steps">
       {steps.map((step, i) => (
-        <div class="step">
+        <div class="step fade-in">
           <div class="step-number">{step.number}</div>
           <div class="step-content">
             <h3>{step.title}</h3>

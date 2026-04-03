@@ -4,7 +4,7 @@
 <section class="hero">
   <div class="container">
     <div class="hero-content">
-      <img src="/images/logo.png" alt="MOLTamp" class="hero-logo" />
+      <img src="/images/logo.png" alt="" class="hero-logo" width="88" height="88" />
 
       <span class="badge">
         <span class="badge-dot"></span>
@@ -21,33 +21,38 @@
         Live2D desk pets, and real-time telemetry. The vibes are the feature.
       </p>
 
-      <div class="hero-actions">
-        <a href="#pricing" class="btn btn-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="hero-download">
+        <a href="#pricing" class="btn btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
           Download for Mac
         </a>
-        <a href="https://github.com/shoot-here/moltamp" class="btn btn-secondary" target="_blank" rel="noopener">
-          View Source
-        </a>
       </div>
 
-      <p class="hero-note">Free forever. $10 kills the nag popup.</p>
+      <div class="hero-platform">
+        <svg class="apple-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        <span>Available on macOS</span>
+        <span class="platform-divider"></span>
+        <span class="platform-soon">Windows + Linux coming soon</span>
+      </div>
     </div>
 
-    <div class="hero-screenshot">
+    <!-- Video / demo area — swap src when video is ready -->
+    <div class="hero-demo fade-in">
       <div class="glow-border">
-        <div class="screenshot-placeholder">
-          <div class="placeholder-chrome">
+        <div class="demo-container">
+          <div class="demo-chrome">
             <div class="ph-dot"></div>
             <div class="ph-dot"></div>
             <div class="ph-dot"></div>
             <span class="ph-title">MOLTamp</span>
           </div>
-          <div class="placeholder-body">
+          <div class="demo-body">
             <div class="ph-sidebar">
               <div class="ph-block" style="height: 40px; opacity: 0.3;"></div>
               <div class="ph-block" style="height: 60px; opacity: 0.2;"></div>
@@ -64,13 +69,14 @@
               <div class="ph-block" style="height: 50px; opacity: 0.2;"></div>
             </div>
           </div>
-          <div class="placeholder-status">
+          <div class="demo-status">
             <span>cyberdeck</span>
             <span>~/projects</span>
             <span>opus 4.6</span>
           </div>
         </div>
       </div>
+      <p class="demo-caption">Demo video coming soon</p>
     </div>
   </div>
 </section>
@@ -142,34 +148,59 @@
     line-height: 1.7;
   }
 
-  .hero-actions {
+  .hero-download {
     display: flex;
     gap: 16px;
     justify-content: center;
     flex-wrap: wrap;
   }
 
-  .hero-note {
+  .btn-lg {
+    padding: 14px 32px;
+    font-size: 1rem;
+  }
+
+  /* Platform badge */
+  .hero-platform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     margin-top: 20px;
     font-size: 0.85rem;
     color: var(--text-dim);
   }
 
-  /* Screenshot placeholder */
-  .hero-screenshot {
+  .apple-icon {
+    opacity: 0.7;
+  }
+
+  .platform-divider {
+    width: 1px;
+    height: 14px;
+    background: var(--border-hover);
+    margin: 0 4px;
+  }
+
+  .platform-soon {
+    color: var(--text-dim);
+  }
+
+  /* Demo area */
+  .hero-demo {
     margin-top: 64px;
     position: relative;
     z-index: 1;
   }
 
-  .screenshot-placeholder {
+  .demo-container {
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--border);
   }
 
-  .placeholder-chrome {
+  .demo-chrome {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -192,7 +223,7 @@
     color: var(--text-dim);
   }
 
-  .placeholder-body {
+  .demo-body {
     display: grid;
     grid-template-columns: 160px 1fr 140px;
     min-height: 340px;
@@ -247,7 +278,7 @@
     50% { opacity: 0; }
   }
 
-  .placeholder-status {
+  .demo-status {
     display: flex;
     justify-content: space-between;
     padding: 8px 16px;
@@ -258,8 +289,16 @@
     border-top: 1px solid var(--border);
   }
 
+  .demo-caption {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
   @media (max-width: 768px) {
-    .placeholder-body {
+    .demo-body {
       grid-template-columns: 1fr;
     }
 

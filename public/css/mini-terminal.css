@@ -1,0 +1,150 @@
+/**
+ * MiniTerminal — shared skin preview component.
+ * Single source of truth. Used by: SkinShowcase, gallery, detail page, author page.
+ *
+ * Base size = homepage showcase (2-col). Scale with CSS container or font-size.
+ * For gallery cards (smaller): wrap in .mt-sm
+ * For detail hero (larger): wrap in .mt-lg
+ */
+
+.mini-terminal {
+  position: relative;
+  aspect-ratio: 14 / 9;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+
+.mt-titlebar {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.mt-dots { display: flex; gap: 4px; }
+.mt-dots span { width: 7px; height: 7px; border-radius: 50%; display: block; }
+
+.mt-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.55rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mt-vibes { height: 6px; flex-shrink: 0; }
+
+.mt-deck { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+
+.mt-panel-left {
+  width: 14%;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mt-nav-item { display: flex; gap: 3px; align-items: center; }
+.mt-nav-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; display: block; }
+.mt-nav-bar { height: 2px; flex: 1; border-radius: 1px; display: block; }
+
+.mt-term {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.6rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.mt-line { white-space: nowrap; }
+
+.mt-ansi { margin: 4px 0 2px; display: flex; flex-direction: column; gap: 2px; }
+.mt-ansi-row { display: flex; gap: 2px; }
+.mt-ansi-row span { flex: 1; height: 5px; border-radius: 1px; display: block; }
+
+.mt-panel-right {
+  width: 15%;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mt-gauge { width: 16px; height: 16px; border-radius: 50%; border: 2px solid; margin-top: 4px; }
+.mt-bar { height: 2px; border-radius: 1px; }
+
+.mt-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.45rem;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+}
+
+.mt-status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; display: block; }
+.mt-status-name { opacity: 0.7; letter-spacing: 0.03em; }
+.mt-status-sep { opacity: 0.25; }
+.mt-status-badge { padding: 0 4px; border-radius: 2px; font-size: 0.4rem; flex-shrink: 0; }
+.mt-status-spacer { flex: 1; }
+.mt-status-meter { width: 28px; height: 4px; border-radius: 2px; overflow: hidden; flex-shrink: 0; display: block; }
+.mt-status-meter span { display: block; height: 100%; border-radius: 2px; }
+
+/* Effects */
+.mt-scanlines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px); pointer-events: none; }
+.mt-glow { position: absolute; inset: 0; pointer-events: none; }
+.mt-crt { position: absolute; inset: 0; box-shadow: inset 0 0 16px rgba(0,0,0,0.15); pointer-events: none; }
+
+/* ── Size variant: small (gallery cards, 4-col) ── */
+.mt-sm .mini-terminal { aspect-ratio: 14 / 9; }
+.mt-sm .mt-titlebar { padding: 3px 6px; }
+.mt-sm .mt-dots span { width: 5px; height: 5px; }
+.mt-sm .mt-title { font-size: 0.42rem; }
+.mt-sm .mt-vibes { height: 4px; }
+.mt-sm .mt-panel-left { padding: 4px 3px; gap: 3px; }
+.mt-sm .mt-nav-dot { width: 3px; height: 3px; }
+.mt-sm .mt-nav-bar { height: 1.5px; }
+.mt-sm .mt-term { padding: 4px 6px; font-size: 0.45rem; }
+.mt-sm .mt-ansi { margin: 3px 0 1px; gap: 1px; }
+.mt-sm .mt-ansi-row { gap: 1px; }
+.mt-sm .mt-ansi-row span { height: 4px; }
+.mt-sm .mt-panel-right { padding: 4px 3px; gap: 3px; }
+.mt-sm .mt-gauge { width: 12px; height: 12px; }
+.mt-sm .mt-bar { height: 1.5px; }
+.mt-sm .mt-status { gap: 3px; padding: 2px 6px; font-size: 0.35rem; }
+.mt-sm .mt-status-dot { width: 4px; height: 4px; }
+.mt-sm .mt-status-badge { font-size: 0.3rem; padding: 0 3px; }
+.mt-sm .mt-status-meter { width: 20px; height: 3px; }
+
+/* ── Size variant: large (detail page hero) ── */
+.mt-lg .mini-terminal { aspect-ratio: 16 / 9; }
+.mt-lg .mt-titlebar { padding: 8px 14px; }
+.mt-lg .mt-dots span { width: 10px; height: 10px; }
+.mt-lg .mt-dots { gap: 6px; }
+.mt-lg .mt-title { font-size: 0.7rem; }
+.mt-lg .mt-vibes { height: 10px; }
+.mt-lg .mt-panel-left { padding: 10px 6px; gap: 6px; }
+.mt-lg .mt-nav-dot { width: 5px; height: 5px; }
+.mt-lg .mt-nav-bar { height: 2.5px; }
+.mt-lg .mt-term { padding: 12px 16px; font-size: 0.8rem; line-height: 1.6; }
+.mt-lg .mt-ansi { margin: 6px 0 3px; gap: 3px; }
+.mt-lg .mt-ansi-row { gap: 3px; }
+.mt-lg .mt-ansi-row span { height: 8px; border-radius: 2px; }
+.mt-lg .mt-panel-right { padding: 10px 6px; gap: 6px; }
+.mt-lg .mt-gauge { width: 22px; height: 22px; border-width: 2.5px; }
+.mt-lg .mt-bar { height: 2.5px; }
+.mt-lg .mt-status { gap: 6px; padding: 5px 14px; font-size: 0.58rem; }
+.mt-lg .mt-status-dot { width: 7px; height: 7px; }
+.mt-lg .mt-status-badge { font-size: 0.48rem; padding: 1px 6px; }
+.mt-lg .mt-status-meter { width: 36px; height: 5px; }

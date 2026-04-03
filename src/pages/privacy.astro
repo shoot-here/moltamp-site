@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Privacy Policy — MOLTamp">
+  <Nav />
+  <main class="legal-page">
+    <div class="container">
+      <div class="legal-content">
+        <h1>Privacy Policy</h1>
+        <p class="legal-updated">Last updated: April 2026</p>
+
+        <section>
+          <h2>What we collect</h2>
+          <p>When you purchase a license, we collect your email address to deliver your license key. That's it.</p>
+        </section>
+
+        <section>
+          <h2>What the app does</h2>
+          <p>MOLTamp runs entirely on your machine. The only network request the app ever makes is a single license key validation call — sending only your key and email. No telemetry, no analytics, no tracking of any kind leaves your computer.</p>
+        </section>
+
+        <section>
+          <h2>Payment processing</h2>
+          <p>Payments are handled by Stripe. We never see or store your card details. Stripe's privacy policy governs payment data.</p>
+        </section>
+
+        <section>
+          <h2>Data storage</h2>
+          <p>Your email is stored in our database solely for license management. We do not share, sell, or rent your information to anyone.</p>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <p>Questions? Email <a href="mailto:privacy@moltamp.com">privacy@moltamp.com</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .legal-page {
+    padding: calc(var(--nav-height) + 40px) 0 80px;
+  }
+
+  .legal-content {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+
+  .legal-updated {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    margin-bottom: 40px;
+  }
+
+  section {
+    margin-bottom: 32px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+</style>

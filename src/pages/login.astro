@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Login — MOLTamp Community">
+  <Nav />
+  <main class="login-page">
+    <div class="container">
+      <div class="login-card card">
+        <h1>Community Login</h1>
+        <p class="login-desc">Sign in with your license email and key to upload and share skins.</p>
+
+        <form id="login-form" class="login-form">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required />
+
+          <label for="license_key">License Key</label>
+          <input type="text" id="license_key" name="license_key" placeholder="MOLT-XXXX-XXXX-XXXX-XXXX" required />
+
+          <label for="display_name">Display Name <span class="optional">(optional)</span></label>
+          <input type="text" id="display_name" name="display_name" placeholder="Your name" maxlength="50" />
+
+          <p class="form-error" id="form-error" role="alert"></p>
+
+          <button type="submit" class="btn btn-primary login-btn" id="login-btn">
+            Sign In
+          </button>
+        </form>
+
+        <p class="login-note">Don't have a license? <a href="/buy">Get one for $20</a></p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('login-form') as HTMLFormElement;
+  const btn = document.getElementById('login-btn') as HTMLButtonElement;
+  const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
+
+  // Check if already logged in
+  fetch('/api/auth/me').then(r => {
+    if (r.ok) window.location.href = '/dashboard';
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: (document.getElementById('email') as HTMLInputElement).value,
+          license_key: (document.getElementById('license_key') as HTMLInputElement).value,
+          display_name: (document.getElementById('display_name') as HTMLInputElement).value || undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        window.location.href = '/dashboard';
+      } else {
+        errorEl.textContent = data.error || 'Invalid credentials';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    } catch {
+      errorEl.textContent = 'Something went wrong. Please try again.';
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  });
+</script>
+
+<style>
+  .login-page {
+    padding: calc(var(--nav-height) + 80px) 0 120px;
+    min-height: 100vh;
+  }
+
+  .login-card {
+    max-width: 440px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 48px 40px;
+  }
+
+  .login-card h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  .login-desc {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    font-size: 0.95rem;
+  }
+
+  .login-form {
+    text-align: left;
+  }
+
+  .login-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+
+  .login-form label:first-of-type {
+    margin-top: 0;
+  }
+
+  .optional {
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .login-form input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .login-form input:focus {
+    border-color: var(--accent);
+  }
+
+  #license_key {
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  .form-error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin-top: 12px;
+  }
+
+  .login-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+  .login-note {
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+</style>

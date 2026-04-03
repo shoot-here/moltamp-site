@@ -1,0 +1,446 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Dashboard — MOLTamp Community">
+  <Nav />
+  <main class="dashboard-page">
+    <div class="container">
+      <div class="dash-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="dash-user" id="dash-user"></p>
+        </div>
+        <div class="dash-actions">
+          <a href="/skins" class="btn btn-secondary btn-sm">Browse Gallery</a>
+          <button class="btn btn-secondary btn-sm" id="logout-btn">Sign Out</button>
+        </div>
+      </div>
+
+      <!-- Upload Section -->
+      <section class="dash-section">
+        <h2>Upload a Skin</h2>
+        <form id="upload-form" class="upload-form">
+          <div class="upload-drop" id="upload-drop">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p>Drop a <code>.moltamp</code> or <code>.zip</code> skin file here or click to browse</p>
+            <input type="file" id="file-input" accept=".moltamp,.zip" />
+          </div>
+
+          <div class="upload-fields" id="upload-fields" style="display:none">
+            <p class="upload-filename" id="upload-filename"></p>
+
+            <label for="upload-tags">Tags <span class="optional">(comma-separated, max 5)</span></label>
+            <input type="text" id="upload-tags" placeholder="retro, cyberpunk, minimal" maxlength="120" />
+
+            <p class="form-error" id="upload-error" role="alert"></p>
+
+            <button type="submit" class="btn btn-primary upload-btn" id="upload-btn">
+              Upload Skin
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- My Skins -->
+      <section class="dash-section">
+        <h2>My Skins</h2>
+        <div id="my-skins" class="my-skins-grid"></div>
+        <p id="no-skins" class="empty-msg" style="display:none">You haven't uploaded any skins yet.</p>
+      </section>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Auth check
+  let currentUser: { id: number; email: string; display_name: string } | null = null;
+
+  async function checkAuth() {
+    const res = await fetch('/api/auth/me');
+    if (!res.ok) {
+      window.location.href = '/login';
+      return;
+    }
+    const data = await res.json();
+    currentUser = data.user;
+    document.getElementById('dash-user')!.textContent = `${data.user.display_name} · ${data.user.email}`;
+  }
+
+  checkAuth().then(() => loadMySkins());
+
+  // Logout
+  document.getElementById('logout-btn')!.addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/';
+  });
+
+  // File upload
+  const dropZone = document.getElementById('upload-drop')!;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const uploadFields = document.getElementById('upload-fields')!;
+  const uploadFilename = document.getElementById('upload-filename')!;
+  const uploadForm = document.getElementById('upload-form') as HTMLFormElement;
+  const uploadBtn = document.getElementById('upload-btn') as HTMLButtonElement;
+  const uploadError = document.getElementById('upload-error')!;
+
+  let selectedFile: File | null = null;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer?.files[0];
+    if (file) selectFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files?.[0]) selectFile(fileInput.files[0]);
+  });
+
+  function selectFile(file: File) {
+    selectedFile = file;
+    uploadFilename.textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+    uploadFields.style.display = 'block';
+    uploadError.textContent = '';
+  }
+
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!selectedFile) return;
+
+    uploadError.textContent = '';
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Uploading...';
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    const tags = (document.getElementById('upload-tags') as HTMLInputElement).value;
+    if (tags) formData.append('tags', tags);
+
+    try {
+      const res = await fetch('/api/skins', { method: 'POST', body: formData });
+      let data: any;
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.text();
+        throw new Error(`Server returned ${res.status}: ${text.substring(0, 200)}`);
+      }
+
+      if (data.success) {
+        selectedFile = null;
+        fileInput.value = '';
+        uploadFields.style.display = 'none';
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload Skin';
+
+        if (data.skin?.warnings?.length) {
+          uploadError.style.color = '#f59e0b';
+          uploadError.textContent = 'Uploaded with warnings: ' + data.skin.warnings.join('; ');
+        }
+
+        loadMySkins();
+      } else {
+        const msg = data.errors?.join('; ') || data.error || 'Upload failed';
+        uploadError.style.color = '#ef4444';
+        uploadError.textContent = msg;
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload Skin';
+      }
+    } catch (err) {
+      uploadError.style.color = '#ef4444';
+      uploadError.textContent = err instanceof Error ? err.message : 'Something went wrong.';
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = 'Upload Skin';
+    }
+  });
+
+  // My skins
+  async function loadMySkins() {
+    const res = await fetch('/api/skins/mine');
+    if (!res.ok) return;
+    const data = await res.json();
+    const container = document.getElementById('my-skins')!;
+    const noSkins = document.getElementById('no-skins')!;
+
+    if (data.skins.length === 0) {
+      container.innerHTML = '';
+      noSkins.style.display = 'block';
+      return;
+    }
+
+    noSkins.style.display = 'none';
+    container.innerHTML = data.skins.map((skin: any) => {
+      const c = skin.colors;
+      return `
+      <div class="my-skin-card" style="background:${c.chromeBg};border:1px solid ${c.chromeBorder};border-radius:var(--radius-md);overflow:hidden">
+        <div class="my-skin-row">
+          <a href="/skins/view?id=${skin.skin_id}" class="my-skin-preview mt-sm">
+            <div class="mini-terminal" style="background:${c.chromeBg}">
+              <div class="mt-titlebar" style="border-bottom:1px solid ${c.chromeBorder}"><div class="mt-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div><div class="mt-title" style="color:${c.chromeDim}">${skin.name}</div></div>
+              <div class="mt-vibes" style="background:linear-gradient(90deg,${c.chromeBg},${c.accent}22,${c.chromeBg});border-bottom:1px solid ${c.chromeBorder}"></div>
+              <div class="mt-deck">
+                <div class="mt-panel-left" style="border-right:1px solid ${c.chromeBorder}"><div class="mt-nav-item"><span class="mt-nav-dot" style="background:${c.accent};opacity:0.8"></span><span class="mt-nav-bar" style="background:${c.accent};opacity:0.5"></span></div></div>
+                <div class="mt-term" style="background:${c.background}"><div class="mt-line"><span style="color:${c.green}">$</span><span style="color:${c.foreground}"> deploy</span></div><div class="mt-line" style="color:${c.green}">ok</div><div class="mt-line"><span style="color:${c.accent}">></span><span style="color:${c.cursor}"> _</span></div></div>
+                <div class="mt-panel-right" style="border-left:1px solid ${c.chromeBorder}"><div class="mt-gauge" style="border-color:${c.chromeBorder};border-top-color:${c.accent}"></div></div>
+              </div>
+              <div class="mt-status" style="border-top:1px solid ${c.chromeBorder};color:${c.chromeDim}"><span class="mt-status-dot" style="background:${c.accent}"></span><span class="mt-status-name">${skin.skin_id}</span></div>
+            </div>
+          </a>
+          <div class="my-skin-info">
+            <h3 style="color:${c.accent}">${skin.name}</h3>
+            <p style="color:${c.chromeDim}">${skin.description}</p>
+            <div class="my-skin-meta" style="color:${c.chromeDim}">
+              <span>v${skin.version}</span>
+              <span>${skin.download_count} downloads</span>
+              <span>${(skin.file_size / 1024).toFixed(0)} KB</span>
+              <span class="status-${skin.status}">${skin.status}</span>
+            </div>
+            <div class="my-skin-actions">
+              <a href="/skins/view?id=${skin.skin_id}" class="btn btn-secondary btn-sm">View</a>
+              <button class="btn btn-secondary btn-sm delete-btn" data-skin-id="${skin.skin_id}">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    container.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const skinId = (btn as HTMLElement).dataset.skinId;
+        if (!confirm(`Delete "${skinId}"?`)) return;
+
+        const res = await fetch(`/api/skins/${skinId}`, { method: 'DELETE' });
+        if (res.ok) loadMySkins();
+      });
+    });
+  }
+</script>
+
+<style>
+  .dashboard-page {
+    padding: calc(var(--nav-height) + 40px) 0 80px;
+    min-height: 100vh;
+  }
+
+  .dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 48px;
+    gap: 16px;
+  }
+
+  .dash-header h1 {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+
+  .dash-user {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+
+  .dash-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .dash-section {
+    margin-bottom: 48px;
+  }
+
+  .dash-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  /* Upload */
+  .upload-drop {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-dim);
+  }
+
+  .upload-drop:hover,
+  .upload-drop.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+    color: var(--accent);
+  }
+
+  .upload-drop svg {
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  .upload-drop p {
+    font-size: 0.9rem;
+  }
+
+  .upload-drop code {
+    font-family: var(--font-mono);
+    background: var(--bg-card);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.85em;
+  }
+
+  .upload-drop input[type="file"] {
+    display: none;
+  }
+
+  .upload-fields {
+    margin-top: 20px;
+  }
+
+  .upload-filename {
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .upload-fields label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .optional {
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .upload-fields input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .upload-fields input:focus {
+    border-color: var(--accent);
+  }
+
+  .form-error {
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin-top: 12px;
+  }
+
+  .upload-btn {
+    margin-top: 8px;
+  }
+
+  /* My Skins */
+  .my-skins-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .my-skin-card {
+    transition: border-color var(--transition-fast);
+  }
+
+  .my-skin-card:hover {
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .my-skin-row {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .my-skin-preview {
+    width: 200px;
+    flex-shrink: 0;
+    display: block;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .my-skin-info {
+    flex: 1;
+    padding: 16px 20px 16px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .my-skin-info h3 {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+
+  .my-skin-info p {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .my-skin-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 0.78rem;
+    margin-bottom: 12px;
+  }
+
+  .my-skin-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .status-active { color: var(--color-success); }
+  .status-hidden { color: var(--text-dim); }
+  .status-flagged { color: #ef4444; }
+
+  .empty-msg {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    padding: 32px 0;
+  }
+
+  .btn-sm {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 600px) {
+    .dash-header {
+      flex-direction: column;
+    }
+
+    .my-skin-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

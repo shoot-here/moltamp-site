@@ -1,0 +1,156 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<BaseLayout title="Community Skins — MOLTamp">
+  <Nav />
+  <main id="main-content" class="gallery-page">
+    <div class="container">
+      <div class="gallery-header fade-in">
+        <h1>Skin Gallery</h1>
+        <p>Community-built skins for MOLTamp. Click any to preview and download.</p>
+      </div>
+
+      <div class="gallery-controls">
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search skins..." />
+        </div>
+        <div class="controls-row">
+          <div class="tag-chips" id="tag-chips"></div>
+          <select id="sort-select" class="sort-select">
+            <option value="newest">Newest</option>
+            <option value="popular">Most Popular</option>
+            <option value="updated">Recently Updated</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="skins-grid" id="skins-grid"></div>
+      <div class="pagination" id="pagination"></div>
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <p>No skins found. Be the first to <a href="/dashboard">upload one</a>!</p>
+      </div>
+
+      <div class="gallery-cta">
+        <p>Got a skin to share?</p>
+        <a href="/login" class="btn btn-primary" id="cta-btn">Sign in to upload</a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script is:inline src="/js/skin-card.js"></script>
+<script>
+  let currentPage = 1, currentTag = '', currentSort = 'newest';
+  let searchTimeout: ReturnType<typeof setTimeout>;
+
+  const grid = document.getElementById('skins-grid')!;
+  const pagination = document.getElementById('pagination')!;
+  const emptyState = document.getElementById('empty-state')!;
+  const tagChips = document.getElementById('tag-chips')!;
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  const ctaBtn = document.getElementById('cta-btn') as HTMLAnchorElement;
+
+  fetch('/api/auth/me').then(r => { if (r.ok) { ctaBtn.href = '/dashboard'; ctaBtn.textContent = 'Go to Dashboard'; } });
+
+  fetch('/api/skins/tags').then(r => r.json()).then(data => {
+    tagChips.innerHTML = data.tags.map((t: {tag:string;count:number}) =>
+      `<button class="tag-chip" data-tag="${t.tag}">${t.tag} <span>${t.count}</span></button>`).join('');
+    tagChips.querySelectorAll('.tag-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = (btn as HTMLElement).dataset.tag!;
+        currentTag = currentTag === tag ? '' : tag;
+        tagChips.querySelectorAll('.tag-chip').forEach(b => b.classList.remove('active'));
+        if (currentTag) btn.classList.add('active');
+        currentPage = 1; loadSkins();
+      });
+    });
+  });
+
+  searchInput.addEventListener('input', () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { currentPage = 1; loadSkins(); }, 300); });
+  sortSelect.addEventListener('change', () => { currentSort = sortSelect.value; currentPage = 1; loadSkins(); });
+
+  async function loadSkins() {
+    const params = new URLSearchParams({ page: String(currentPage), sort: currentSort, limit: '24' });
+    if (searchInput.value.trim()) params.set('q', searchInput.value.trim());
+    if (currentTag) params.set('tag', currentTag);
+    const data = await fetch(`/api/skins?${params}`).then(r => r.json());
+    if (data.skins.length === 0) { grid.innerHTML = ''; emptyState.style.display = 'block'; pagination.innerHTML = ''; return; }
+    emptyState.style.display = 'none';
+    grid.innerHTML = data.skins.map((s: any) => renderSkinCard(s)).join('');
+    renderPag(data.pagination);
+  }
+
+  function renderPag(p: {page:number;pages:number;total:number}) {
+    if (p.pages <= 1) { pagination.innerHTML = ''; return; }
+    let h = '';
+    if (p.page > 1) h += `<button class="pg" data-p="${p.page-1}">Prev</button>`;
+    for (let i = 1; i <= p.pages; i++) {
+      if (i === p.page) h += `<span class="pg-cur">${i}</span>`;
+      else if (Math.abs(i-p.page)<=2||i===1||i===p.pages) h += `<button class="pg" data-p="${i}">${i}</button>`;
+      else if (Math.abs(i-p.page)===3) h += '<span class="pg-dot">...</span>';
+    }
+    if (p.page < p.pages) h += `<button class="pg" data-p="${p.page+1}">Next</button>`;
+    pagination.innerHTML = h;
+    pagination.querySelectorAll('.pg').forEach(b => b.addEventListener('click', () => { currentPage = parseInt((b as HTMLElement).dataset.p!); loadSkins(); window.scrollTo({top:0,behavior:'smooth'}); }));
+  }
+
+  loadSkins();
+</script>
+
+<style>
+  .gallery-page { padding: calc(var(--nav-height) + 24px) 0 80px; }
+  .gallery-header { text-align: center; margin-bottom: 24px; }
+  .gallery-header h1 { font-size: clamp(1.5rem, 3.5vw, 2rem); margin-bottom: 6px; }
+  .gallery-header p { color: var(--text-secondary); font-size: 0.9rem; }
+
+  .gallery-controls { margin-bottom: 20px; }
+  .search-bar { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:10px; color:var(--text-dim); }
+  .search-bar input { flex:1; background:none; border:none; color:var(--text-primary); font-size:0.88rem; outline:none; }
+  .search-bar input::placeholder { color:var(--text-dim); }
+  .controls-row { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .tag-chips { display:flex; gap:5px; flex-wrap:wrap; }
+  .tag-chip { padding:3px 9px; font-size:0.72rem; border-radius:100px; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); cursor:pointer; transition:all var(--transition-fast); }
+  .tag-chip:hover { border-color:var(--accent); color:var(--accent); }
+  .tag-chip.active { background:var(--accent-subtle); border-color:var(--accent); color:var(--accent); }
+  .tag-chip span { color:var(--text-dim); margin-left:3px; font-size:0.6rem; }
+  .sort-select { padding:5px 9px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-secondary); font-size:0.78rem; cursor:pointer; }
+
+  /* Dense visual grid */
+  .skins-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+
+  /* Card — MiniTerminal styles from /css/mini-terminal.css (.mt-sm variant) */
+  .skin-card { display:block; position:relative; border:1px solid; border-radius:var(--radius-md); overflow:hidden; text-decoration:none; transition:transform var(--transition-fast), box-shadow var(--transition-fast); }
+  .skin-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.4); color:inherit; }
+
+  /* Name overlay */
+  .skin-card-overlay { position:absolute; bottom:0; left:0; right:0; padding:20px 10px 6px; pointer-events:none; transition:opacity var(--transition-fast); }
+  .skin-card-name { font-size:0.78rem; font-weight:600; }
+
+  /* Hover overlay */
+  .skin-card-hover { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; transition:opacity var(--transition-fast); font-size:0.75rem; }
+  .skin-card:hover .skin-card-hover { opacity:1; }
+  .skin-card:hover .skin-card-overlay { opacity:0; }
+  .hover-author { font-weight:500; }
+  .hover-downloads { font-size:0.65rem; }
+
+  .pagination { display:flex; justify-content:center; gap:6px; margin-top:24px; }
+  .pg { padding:5px 10px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-secondary); cursor:pointer; font-size:0.78rem; }
+  .pg:hover { border-color:var(--accent); color:var(--accent); }
+  .pg-cur { padding:5px 10px; background:var(--accent); color:#fff; border-radius:var(--radius-sm); font-size:0.78rem; font-weight:600; }
+  .pg-dot { color:var(--text-dim); padding:5px 3px; }
+  .empty-state { text-align:center; padding:48px 0; color:var(--text-dim); }
+  .gallery-cta { text-align:center; margin-top:40px; padding-top:24px; border-top:1px solid var(--border); }
+  .gallery-cta p { color:var(--text-dim); margin-bottom:10px; }
+
+  @media (max-width:1100px) { .skins-grid { grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:768px) { .skins-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:480px) { .skins-grid { grid-template-columns:1fr; } }
+</style>

@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Terms of Service — MOLTamp">
+  <Nav />
+  <main class="legal-page">
+    <div class="container">
+      <div class="legal-content">
+        <h1>Terms of Service</h1>
+        <p class="legal-updated">Last updated: April 2026</p>
+
+        <section>
+          <h2>License</h2>
+          <p>MOLTamp is free to use. A one-time $20 payment removes the nag popup and grants a perpetual, non-transferable license key tied to your email address.</p>
+        </section>
+
+        <section>
+          <h2>What you get</h2>
+          <p>The free and paid versions are functionally identical. The license key removes the periodic popup. One key works on all your personal machines.</p>
+        </section>
+
+        <section>
+          <h2>Refunds</h2>
+          <p>Full refund within 30 days of purchase, no questions asked. Email <a href="mailto:refunds@moltamp.com">refunds@moltamp.com</a>.</p>
+        </section>
+
+        <section>
+          <h2>Disclaimer</h2>
+          <p>MOLTamp is provided as-is. It wraps Claude Code but is not affiliated with or endorsed by Anthropic. Use at your own risk.</p>
+        </section>
+
+        <section>
+          <h2>Changes</h2>
+          <p>We may update these terms. Continued use after changes constitutes acceptance.</p>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <p>Questions? Email <a href="mailto:hello@moltamp.com">hello@moltamp.com</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .legal-page {
+    padding: calc(var(--nav-height) + 40px) 0 80px;
+  }
+
+  .legal-content {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+
+  .legal-updated {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    margin-bottom: 40px;
+  }
+
+  section {
+    margin-bottom: 32px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+</style>

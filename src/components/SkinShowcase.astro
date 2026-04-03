@@ -1,72 +1,148 @@
 ---
 const skins = [
   {
-    name: 'Default',
-    description: 'Clean dark theme. No frills, all function.',
-    colors: ['#08080a', '#4d9fff', '#f0f0f2', '#222228'],
+    name: 'Blade Runner',
+    description: 'Warm amber CRT. Scanlines, glow, and retro phosphor vibes.',
+    c: {
+      chromeBg:'#080600', chromeBorder:'#221800', chromeDim:'#554411', accent:'#ffaa44',
+      bg:'#0a0800', fg:'#d4a054', cursor:'#ffaa44',
+      green:'#aa8833', yellow:'#ffcc66', cyan:'#ddaa44',
+      ansi:['#0a0800','#ee6633','#aa8833','#ffcc66','#775522','#cc7744','#ddaa44','#d4a054'],
+      ansiBright:['#1a1400','#ff8844','#ccaa55','#ffe088','#997733','#ddaa66','#eebb55','#ffe0a0'],
+      scanlines:true, glow:true, crt:true, glowColor:'rgba(255,170,68,0.06)',
+    },
   },
   {
-    name: 'Cyberdeck',
-    description: 'Neon green on black. Scanlines. Maximum hacker.',
-    colors: ['#0a0f0a', '#00ff88', '#e0ffe0', '#1a2f1a'],
+    name: 'Phosphor',
+    description: 'Monochrome green terminal. Full CRT simulation.',
+    c: {
+      chromeBg:'#020602', chromeBorder:'#003d11', chromeDim:'#006b1d', accent:'#00ff41',
+      bg:'#040a04', fg:'#00ff41', cursor:'#00ff41',
+      green:'#00ff41', yellow:'#66ff88', cyan:'#88ffbb',
+      ansi:['#0a140a','#00cc33','#00ff41','#66ff88','#009922','#44ee99','#88ffbb','#00ff41'],
+      ansiBright:['#1a2e1a','#22dd55','#44ff77','#88ffaa','#11bb44','#66ffaa','#aaffcc','#ccffdd'],
+      scanlines:true, glow:true, crt:true, glowColor:'rgba(0,255,65,0.12)',
+    },
   },
   {
-    name: 'Sakura',
-    description: 'Soft pink pastels with cherry blossom vibes.',
-    colors: ['#1a0f14', '#ff6b9d', '#fff0f5', '#2a1520'],
+    name: 'Neon Horizon',
+    description: 'Cyberpunk purple-black with electric cyan accents.',
+    c: {
+      chromeBg:'#08001a', chromeBorder:'#1a0040', chromeDim:'#2a1050', accent:'#00ffff',
+      bg:'#0a0020', fg:'#c8e6ff', cursor:'#00ffff',
+      green:'#00ff88', yellow:'#ffcc00', cyan:'#00ffff',
+      ansi:['#0a0020','#ff2266','#00ff88','#ffcc00','#00aaff','#ff00aa','#00ffff','#c8e6ff'],
+      ansiBright:['#1a1040','#ff4488','#33ffaa','#ffdd44','#44ccff','#ff44cc','#44ffff','#e0f0ff'],
+      scanlines:true, glow:true, crt:false, glowColor:'rgba(0,255,255,0.06)',
+    },
   },
   {
-    name: 'Amber',
-    description: 'Warm amber CRT. Retro phosphor terminal.',
-    colors: ['#0a0800', '#ffb347', '#ffe8c0', '#1f1a0a'],
+    name: 'Deep Space',
+    description: 'Cool blue with vibrant ANSI palette. Clean and readable.',
+    c: {
+      chromeBg:'#040810', chromeBorder:'#0c2030', chromeDim:'#1a3848', accent:'#00e5ff',
+      bg:'#040810', fg:'#a8d8ea', cursor:'#00e5ff',
+      green:'#00e676', yellow:'#ffd740', cyan:'#00e5ff',
+      ansi:['#0a1018','#ff4455','#00e676','#ffd740','#40c4ff','#e040fb','#00e5ff','#a8d8ea'],
+      ansiBright:['#1a2838','#ff6677','#33ff99','#ffe566','#66d4ff','#ea66ff','#33eeff','#d4eef8'],
+      scanlines:true, glow:true, crt:false, glowColor:'rgba(0,229,255,0.06)',
+    },
   },
 ];
 ---
 
 <section id="skins" class="section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header fade-in">
       <span class="badge">Skins</span>
       <h2>Make it yours</h2>
       <p>Every skin is a folder with a JSON manifest and a CSS theme. Build one in minutes, share it with everyone.</p>
     </div>
 
-    <div class="skins-grid">
+    <div class="skins-grid stagger-children">
       {skins.map((skin) => (
-        <div class="skin-card card">
-          <div class="skin-preview" style={`background: ${skin.colors[0]};`}>
-            <div class="skin-mockup">
-              <div class="sm-bar" style={`background: ${skin.colors[3]};`}>
-                <span class="sm-dot" style={`background: ${skin.colors[1]};`}></span>
-                <span class="sm-dot" style={`background: ${skin.colors[1]}; opacity: 0.5;`}></span>
-                <span class="sm-dot" style={`background: ${skin.colors[1]}; opacity: 0.3;`}></span>
+        <div class="skin-card card fade-in" style={`padding:0;overflow:hidden;background:${skin.c.chromeBg};border-color:${skin.c.chromeBorder};`}>
+          <!-- MiniTerminal -->
+          <div class="mini-terminal" style={`background:${skin.c.chromeBg};border-bottom:1px solid ${skin.c.chromeBorder};`}>
+            <!-- Title bar -->
+            <div class="mt-titlebar" style={`border-bottom:1px solid ${skin.c.chromeBorder};`}>
+              <div class="mt-dots">
+                <span style="background:#ff5f57;"></span>
+                <span style="background:#febc2e;"></span>
+                <span style="background:#28c840;"></span>
               </div>
-              <div class="sm-body">
-                <div class="sm-line" style={`color: ${skin.colors[1]};`}>&gt; _</div>
-                <div class="sm-line" style={`color: ${skin.colors[2]}; opacity: 0.4;`}>ready</div>
+              <div class="mt-title" style={`color:${skin.c.chromeDim};`}>{skin.name}</div>
+            </div>
+            <!-- Vibes strip -->
+            <div class="mt-vibes" style={`background:linear-gradient(90deg,${skin.c.chromeBg},${skin.c.accent}22,${skin.c.chromeBg});border-bottom:1px solid ${skin.c.chromeBorder};`}></div>
+            <!-- Deck -->
+            <div class="mt-deck">
+              <!-- Left panel -->
+              <div class="mt-panel-left" style={`border-right:1px solid ${skin.c.chromeBorder};`}>
+                <div class="mt-nav-item">
+                  <span class="mt-nav-dot" style={`background:${skin.c.accent};opacity:0.8;`}></span>
+                  <span class="mt-nav-bar" style={`background:${skin.c.accent};opacity:0.5;`}></span>
+                </div>
+                <div class="mt-nav-item">
+                  <span class="mt-nav-dot" style={`background:${skin.c.chromeDim};opacity:0.4;`}></span>
+                  <span class="mt-nav-bar" style={`background:${skin.c.chromeDim};opacity:0.25;`}></span>
+                </div>
+                <div class="mt-nav-item">
+                  <span class="mt-nav-dot" style={`background:${skin.c.chromeDim};opacity:0.4;`}></span>
+                  <span class="mt-nav-bar" style={`background:${skin.c.chromeDim};opacity:0.25;`}></span>
+                </div>
+              </div>
+              <!-- Terminal -->
+              <div class="mt-term" style={`background:${skin.c.bg};`}>
+                <div class="mt-line"><span style={`color:${skin.c.green};`}>$</span><span style={`color:${skin.c.fg};`}> deploy </span><span style={`color:${skin.c.cyan};`}>--prod</span></div>
+                <div class="mt-line" style={`color:${skin.c.yellow};`}>building...</div>
+                <div class="mt-line" style={`color:${skin.c.green};`}>deployed</div>
+                <!-- ANSI palette -->
+                <div class="mt-ansi">
+                  <div class="mt-ansi-row">
+                    {skin.c.ansi.map((col: string) => <span style={`background:${col};`}></span>)}
+                  </div>
+                  <div class="mt-ansi-row">
+                    {skin.c.ansiBright.map((col: string) => <span style={`background:${col};`}></span>)}
+                  </div>
+                </div>
+                <div class="mt-line"><span style={`color:${skin.c.accent};`}>{'>'}</span><span style={`color:${skin.c.cursor};`}> _</span></div>
+              </div>
+              <!-- Right panel -->
+              <div class="mt-panel-right" style={`border-left:1px solid ${skin.c.chromeBorder};`}>
+                <div class="mt-gauge" style={`border-color:${skin.c.chromeBorder};border-top-color:${skin.c.accent};`}></div>
+                <div class="mt-bar" style={`background:${skin.c.chromeDim};opacity:0.3;width:80%;`}></div>
+                <div class="mt-bar" style={`background:${skin.c.accent};opacity:0.2;width:60%;`}></div>
               </div>
             </div>
+            <!-- Statusbar -->
+            <div class="mt-status" style={`border-top:1px solid ${skin.c.chromeBorder};color:${skin.c.chromeDim};`}>
+              <span class="mt-status-dot" style={`background:${skin.c.accent};`}></span>
+              <span class="mt-status-name">{skin.name.toLowerCase()}</span>
+              <span class="mt-status-sep">|</span>
+              <span class="mt-status-badge" style={`background:${skin.c.accent}22;color:${skin.c.accent};`}>opus</span>
+              <span class="mt-status-spacer"></span>
+              <span class="mt-status-meter" style={`background:${skin.c.chromeDim}33;`}>
+                <span style={`width:42%;background:${skin.c.accent};opacity:0.6;`}></span>
+              </span>
+            </div>
+            <!-- Effects -->
+            {skin.c.scanlines && <div class="mt-scanlines"></div>}
+            {skin.c.glow && <div class="mt-glow" style={`box-shadow:inset 0 0 12px ${skin.c.glowColor};`}></div>}
+            {skin.c.crt && <div class="mt-crt"></div>}
           </div>
-          <div class="skin-info">
-            <div class="skin-name-row">
-              <h3>{skin.name}</h3>
-              <div class="skin-colors">
-                {skin.colors.map((c) => (
-                  <span class="color-dot" style={`background: ${c};`}></span>
-                ))}
-              </div>
-            </div>
-            <p>{skin.description}</p>
+          <!-- Info -->
+          <div class="skin-info" style={`background:${skin.c.chromeBg};`}>
+            <h3 style={`color:${skin.c.accent};`}>{skin.name}</h3>
+            <p style={`color:${skin.c.chromeDim};`}>{skin.description}</p>
           </div>
         </div>
       ))}
     </div>
 
-    <div class="skins-cta">
+    <div class="skins-cta fade-in">
       <p>Or build your own — it's just CSS + JSON.</p>
-      <a href="/skinning" class="btn btn-secondary">
-        Skinning Guide
-      </a>
+      <a href="/skinning" class="btn btn-secondary">Skinning Guide</a>
     </div>
   </div>
 </section>
@@ -74,75 +150,29 @@ const skins = [
 <style>
   .skins-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 
-  .skin-card {
-    padding: 0;
-    overflow: hidden;
+  .skin-card:hover {
+    transform: translateY(-2px);
   }
 
-  .skin-preview {
-    padding: 24px 20px;
-    border-bottom: 1px solid var(--border);
-  }
+  /* MiniTerminal styles from /css/mini-terminal.css (global) */
 
-  .skin-mockup {
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .sm-bar {
-    display: flex;
-    gap: 5px;
-    padding: 6px 10px;
-  }
-
-  .sm-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-  }
-
-  .sm-body {
-    padding: 12px;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    line-height: 1.8;
-  }
-
+  /* Info */
   .skin-info {
-    padding: 16px 20px;
+    padding: 14px 16px;
   }
 
-  .skin-name-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-
-  .skin-name-row h3 {
+  .skin-info h3 {
     font-size: 0.95rem;
-  }
-
-  .skin-colors {
-    display: flex;
-    gap: 4px;
-  }
-
-  .color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 4px;
   }
 
   .skin-info p {
-    color: var(--text-secondary);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
   }
 
   .skins-cta {
@@ -156,13 +186,7 @@ const skins = [
     font-size: 0.9rem;
   }
 
-  @media (max-width: 900px) {
-    .skins-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 480px) {
+  @media (max-width: 700px) {
     .skins-grid {
       grid-template-columns: 1fr;
     }

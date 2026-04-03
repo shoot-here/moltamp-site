@@ -1,0 +1,204 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<BaseLayout title="Skin — MOLTamp Community">
+  <Nav />
+  <main class="detail-page">
+    <div class="container">
+      <div id="skin-detail"><div class="detail-loading">Loading skin...</div></div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script is:inline src="/js/skin-card.js"></script>
+<script>
+  const skinId = new URLSearchParams(window.location.search).get('id');
+  const container = document.getElementById('skin-detail')!;
+  let currentUser: any = null;
+
+  if (!skinId) { container.innerHTML = '<p class="not-found">No skin specified. <a href="/skins">Browse gallery</a></p>'; }
+
+  fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d) currentUser = d.user; });
+
+  async function load() {
+    if (!skinId) return;
+    const res = await fetch(`/api/skins/${skinId}`);
+    if (!res.ok) { container.innerHTML = '<p class="not-found">Skin not found. <a href="/skins">Browse gallery</a></p>'; return; }
+    const { skin } = await res.json();
+    const c = skin.colors;
+    document.title = `${skin.name} — MOLTamp Community`;
+
+    // Check for screenshot
+    let heroHtml = '';
+    try {
+      const ssRes = await fetch(`/api/skins/${skinId}/screenshots/0`, { method: 'HEAD' });
+      if (ssRes.ok) {
+        heroHtml = `<div class="hero-screenshots"><img src="/api/skins/${skinId}/screenshots/0" alt="${skin.name}" class="hero-img" />`;
+        for (let i = 1; i <= 2; i++) {
+          const r = await fetch(`/api/skins/${skinId}/screenshots/${i}`, { method: 'HEAD' });
+          if (r.ok) heroHtml += `<img src="/api/skins/${skinId}/screenshots/${i}" alt="" class="extra-ss" />`;
+        }
+        heroHtml += '</div>';
+      }
+    } catch {}
+
+    if (!heroHtml) {
+      heroHtml = `<div class="hero-mini mt-lg" style="background:${c.chromeBg};border:1px solid ${c.chromeBorder};border-radius:12px;overflow:hidden">
+        ${renderLargeMini(skin)}
+      </div>`;
+    }
+
+    const ansi = [c.black,c.red,c.green,c.yellow,c.blue,c.magenta,c.cyan,c.white];
+    const bright = [c.brightBlack,c.brightRed,c.brightGreen,c.brightYellow,c.brightBlue,c.brightMagenta,c.brightCyan,c.brightWhite];
+    const names = ['black','red','green','yellow','blue','magenta','cyan','white'];
+    const chrome = [{n:'bg',v:c.chromeBg},{n:'text',v:c.chromeText||c.chromeDim},{n:'border',v:c.chromeBorder},{n:'accent',v:c.accent},{n:'dim',v:c.chromeDim},{n:'hover',v:c.chromeHover||c.chromeBg}];
+
+    const effects: string[] = [];
+    if (c.scanlines) effects.push('Scanlines');
+    if (c.glow) effects.push('Glow');
+    if (c.crt) effects.push('CRT');
+
+    const tags = skin.tags?.length ? `<div class="dtags">${skin.tags.map((t:string) => `<a href="/skins?tag=${t}" class="dtag">${t}</a>`).join('')}</div>` : '';
+    const size = (skin.file_size / 1024).toFixed(0);
+
+    container.innerHTML = `
+      <a href="/skins" class="back">← Gallery</a>
+      ${heroHtml}
+      <div class="dmeta">
+        <div class="dhead"><h1 style="color:${c.accent}">${skin.name}</h1><span class="dver">v${skin.version}</span></div>
+        <p class="dauthor">by <a href="/skins/author?name=${encodeURIComponent(skin.author_name)}">${skin.author_name}</a></p>
+        <p class="ddesc">${skin.description}</p>
+        ${tags}
+        ${effects.length ? `<div class="deffects">${effects.map(e => `<span class="ebadge">${e}</span>`).join(' ')}</div>` : ''}
+        <div class="palette">
+          <h3>Terminal — Normal</h3>
+          <div class="swrow">${ansi.map((col: string,i: number) => `<div class="sw" style="background:${col}" title="${names[i]}: ${col}"></div>`).join('')}</div>
+          <h3>Terminal — Bright</h3>
+          <div class="swrow">${bright.map((col: string,i: number) => `<div class="sw" style="background:${col}" title="bright ${names[i]}: ${col}"></div>`).join('')}</div>
+          <h3>Chrome</h3>
+          <div class="swrow">${chrome.map(({n,v}: {n:string,v:string}) => `<div class="sw swc" style="background:${v}" title="${n}: ${v}"></div>`).join('')}</div>
+        </div>
+        <div class="ddownload">
+          <a href="/api/skins/${skinId}/download" class="btn btn-primary dbtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download .moltamp
+          </a>
+          <span class="dmeta-text">${size} KB · ${skin.download_count} downloads</span>
+        </div>
+        <div class="dinstall"><h3>Install</h3><ol><li>Download the <code>.moltamp</code> file</li><li>Open MOLTamp → Settings → Skins</li><li>Click Import and select the file</li></ol></div>
+      </div>
+      <div class="csection" id="csection"><h2>Comments</h2><div id="cform"></div><div id="clist">Loading...</div></div>`;
+
+    loadComments();
+  }
+
+  function renderLargeMini(skin: any) {
+    const c = skin.colors;
+    const ansi = [c.black,c.red,c.green,c.yellow,c.blue,c.magenta,c.cyan,c.white];
+    const bright = [c.brightBlack,c.brightRed,c.brightGreen,c.brightYellow,c.brightBlue,c.brightMagenta,c.brightCyan,c.brightWhite];
+    return `<div class="mini-terminal lgmt" style="background:${c.chromeBg}">
+      <div class="mt-titlebar" style="border-bottom:1px solid ${c.chromeBorder}"><div class="mt-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div><div class="mt-title" style="color:${c.chromeDim}">${skin.name}</div></div>
+      <div class="mt-vibes" style="background:linear-gradient(90deg,${c.chromeBg},${c.accent}22,${c.chromeBg});border-bottom:1px solid ${c.chromeBorder}"></div>
+      <div class="mt-deck">
+        <div class="mt-panel-left" style="border-right:1px solid ${c.chromeBorder}"><div class="mt-nav-item"><span class="mt-nav-dot" style="background:${c.accent};opacity:0.8"></span><span class="mt-nav-bar" style="background:${c.accent};opacity:0.5"></span></div><div class="mt-nav-item"><span class="mt-nav-dot" style="background:${c.chromeDim};opacity:0.4"></span><span class="mt-nav-bar" style="background:${c.chromeDim};opacity:0.25"></span></div><div class="mt-nav-item"><span class="mt-nav-dot" style="background:${c.chromeDim};opacity:0.4"></span><span class="mt-nav-bar" style="background:${c.chromeDim};opacity:0.25"></span></div></div>
+        <div class="mt-term" style="background:${c.background}"><div class="mt-line"><span style="color:${c.green}">$</span><span style="color:${c.foreground}"> claude --skin ${skin.skin_id}</span></div><div class="mt-line" style="color:${c.yellow}">Loading skin...</div><div class="mt-line" style="color:${c.green}">Panels loaded. Vibes immaculate.</div><div class="mt-ansi"><div class="mt-ansi-row">${ansi.map((col:string) => '<span style="background:'+col+'"></span>').join('')}</div><div class="mt-ansi-row">${bright.map((col:string) => '<span style="background:'+col+'"></span>').join('')}</div></div><div class="mt-line"><span style="color:${c.accent}">></span><span style="color:${c.cursor}"> _</span></div></div>
+        <div class="mt-panel-right" style="border-left:1px solid ${c.chromeBorder}"><div class="mt-gauge" style="border-color:${c.chromeBorder};border-top-color:${c.accent}"></div><div class="mt-bar-sm" style="background:${c.chromeDim};opacity:0.3"></div><div class="mt-bar-sm" style="background:${c.accent};opacity:0.2;width:60%"></div></div>
+      </div>
+      <div class="mt-status" style="border-top:1px solid ${c.chromeBorder};color:${c.chromeDim}"><span class="mt-status-dot" style="background:${c.accent}"></span><span class="mt-status-name">${skin.skin_id}</span><span class="mt-status-sep">|</span><span class="mt-status-badge" style="background:${c.accent}22;color:${c.accent}">opus</span><span class="mt-status-spacer"></span><span class="mt-status-meter" style="background:${c.chromeDim}33"><span style="width:42%;background:${c.accent};opacity:0.6"></span></span></div>
+      ${c.scanlines ? '<div class="mt-scanlines"></div>' : ''}
+      ${c.glow ? '<div class="mt-glow" style="box-shadow:inset 0 0 20px '+c.glowColor+'"></div>' : ''}
+    </div>`;
+  }
+
+  async function loadComments() {
+    const cform = document.getElementById('cform')!;
+    const clist = document.getElementById('clist')!;
+    if (currentUser) {
+      cform.innerHTML = `<form id="cf"><textarea id="ct" placeholder="Leave a comment..." maxlength="500" rows="3"></textarea><div class="cfrow"><span class="cc" id="cc">0/500</span><button type="submit" class="btn btn-primary btn-sm">Post</button></div><p class="cerr" id="cerr"></p></form>`;
+      const ta = document.getElementById('ct') as HTMLTextAreaElement;
+      document.getElementById('cc')!;
+      ta.addEventListener('input', () => { document.getElementById('cc')!.textContent = `${ta.value.length}/500`; });
+      document.getElementById('cf')!.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const comment = ta.value.trim();
+        if (!comment) return;
+        const r = await fetch(`/api/skins/${skinId}/comments`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({comment}) });
+        const d = await r.json();
+        if (d.success) { ta.value = ''; document.getElementById('cc')!.textContent = '0/500'; loadComments(); }
+        else document.getElementById('cerr')!.textContent = d.error || 'Failed';
+      });
+    } else {
+      cform.innerHTML = `<p class="signin-prompt"><a href="/login">Sign in</a> to comment.</p>`;
+    }
+    const res = await fetch(`/api/skins/${skinId}/comments?limit=50`);
+    const data = await res.json();
+    if (data.comments.length === 0) { clist.innerHTML = '<p class="nocomm">No comments yet.</p>'; }
+    else { clist.innerHTML = data.comments.map((c:any) => `<div class="comm"><div class="commh"><strong>${c.author}</strong><span class="commd">${new Date(c.created_at).toLocaleDateString()}</span></div><p class="commt">${c.comment}</p></div>`).join(''); }
+  }
+
+  load();
+</script>
+
+<style>
+  .detail-page { padding:calc(var(--nav-height)+24px) 0 80px; }
+  .detail-loading,.not-found { text-align:center; padding:80px 0; color:var(--text-dim); }
+  .back { display:inline-block; color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px; }
+  .back:hover { color:var(--accent); }
+
+  .hero-screenshots { margin-bottom:24px; }
+  .hero-img { width:100%; border-radius:12px; border:1px solid var(--border); }
+  .extra-ss { width:30%; border-radius:6px; border:1px solid var(--border); margin-top:8px; margin-right:8px; display:inline-block; }
+  .hero-mini { margin-bottom:24px; }
+
+  /* MiniTerminal styles from /css/mini-terminal.css (.mt-lg variant for hero) */
+
+  .dmeta { max-width:720px; }
+  .dhead { display:flex; align-items:baseline; gap:12px; margin-bottom:4px; }
+  .dhead h1 { font-size:2rem; }
+  .dver { font-family:var(--font-mono); font-size:0.8rem; color:var(--text-dim); }
+  .dauthor { color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px; }
+  .ddesc { color:var(--text-secondary); line-height:1.7; margin-bottom:20px; }
+  .dtags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+  .dtag { padding:4px 12px; font-size:0.78rem; border-radius:100px; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); }
+  .dtag:hover { border-color:var(--accent); color:var(--accent); }
+  .deffects { display:flex; gap:8px; margin-bottom:20px; }
+  .ebadge { padding:4px 12px; font-size:0.75rem; font-family:var(--font-mono); border-radius:var(--radius-sm); background:var(--accent-subtle); color:var(--accent); border:1px solid var(--accent-glow); }
+
+  .palette { margin-bottom:24px; padding:20px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
+  .palette h3 { font-size:0.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; margin-top:16px; font-weight:500; }
+  .palette h3:first-child { margin-top:0; }
+  .swrow { display:flex; gap:5px; margin-bottom:6px; flex-wrap:wrap; }
+  .sw { width:38px; height:30px; min-width:38px; max-width:38px; flex-shrink:0; border-radius:4px; border:2px solid rgba(255,255,255,0.15); cursor:pointer; transition:transform var(--transition-fast); box-shadow:0 1px 3px rgba(0,0,0,0.3); position:relative; overflow:visible; }
+  .sw:hover { transform:scale(1.15); border-color:rgba(255,255,255,0.4); z-index:1; }
+  .swc { width:50px; min-width:50px; max-width:50px; }
+
+  .ddownload { display:flex; align-items:center; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+  .dbtn { font-size:0.95rem; }
+  .dmeta-text { color:var(--text-dim); font-size:0.85rem; }
+  .dinstall { padding:20px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:40px; }
+  .dinstall h3 { font-size:0.85rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; }
+  .dinstall ol { padding-left:20px; color:var(--text-secondary); font-size:0.9rem; }
+  .dinstall li { padding:4px 0; }
+  .dinstall code { font-family:var(--font-mono); background:var(--bg-secondary); padding:2px 6px; border-radius:3px; font-size:0.85em; }
+
+  .csection { border-top:1px solid var(--border); padding-top:32px; max-width:720px; }
+  .csection h2 { font-size:1.3rem; margin-bottom:20px; }
+  #cf textarea { width:100%; padding:12px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-size:0.9rem; resize:vertical; outline:none; font-family:var(--font-display); }
+  #cf textarea:focus { border-color:var(--accent); }
+  .cfrow { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+  .cc { font-size:0.75rem; color:var(--text-dim); }
+  .cerr { color:#ef4444; font-size:0.82rem; margin-top:6px; }
+  .signin-prompt { color:var(--text-dim); font-size:0.9rem; margin-bottom:20px; }
+  .nocomm { color:var(--text-dim); font-size:0.9rem; }
+  .comm { padding:16px 0; border-bottom:1px solid var(--border); }
+  .comm:last-child { border-bottom:none; }
+  .commh { display:flex; gap:8px; align-items:baseline; margin-bottom:6px; }
+  .commh strong { color:var(--text-primary); font-size:0.88rem; }
+  .commd { color:var(--text-dim); font-size:0.75rem; }
+  .commt { color:var(--text-secondary); font-size:0.88rem; line-height:1.6; }
+  .btn-sm { padding:6px 16px; font-size:0.82rem; }
+</style>

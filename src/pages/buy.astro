@@ -4,7 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<BaseLayout title="Unlock MOLTamp — $10 Lifetime License">
+<BaseLayout title="Unlock MOLTamp — $20 Lifetime License">
   <Nav />
   <main class="buy-page">
     <div class="container">
@@ -15,13 +15,13 @@ import Footer from '../components/Footer.astro';
         </p>
 
         <div class="buy-price">
-          <span class="price">$10</span>
+          <span class="price">$20</span>
           <span class="price-label">one-time payment</span>
         </div>
 
         <div class="buy-includes">
           <h3>What you get:</h3>
-          <ul>
+          <ul class="check-list">
             <li>License key emailed instantly</li>
             <li>No nag popup — ever again</li>
             <li>Works offline after first activation</li>
@@ -38,11 +38,12 @@ import Footer from '../components/Footer.astro';
             placeholder="you@example.com"
             required
           />
+          <p class="form-error" id="form-error" role="alert"></p>
           <button type="submit" class="btn btn-primary buy-btn" id="checkout-btn">
-            Pay $10 — Get License Key
+            Pay $20 — Get License Key
           </button>
           <p class="buy-secure">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
@@ -58,11 +59,13 @@ import Footer from '../components/Footer.astro';
 <script>
   const form = document.getElementById('checkout-form') as HTMLFormElement;
   const btn = document.getElementById('checkout-btn') as HTMLButtonElement;
+  const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = (document.getElementById('email') as HTMLInputElement).value;
 
+    errorEl.textContent = '';
     btn.disabled = true;
     btn.textContent = 'Redirecting to Stripe...';
 
@@ -82,9 +85,8 @@ import Footer from '../components/Footer.astro';
       }
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = 'Pay $10 — Get License Key';
-      alert('Something went wrong. Please try again.');
-      console.error(err);
+      btn.textContent = 'Pay $20 — Get License Key';
+      errorEl.textContent = 'Something went wrong. Please try again.';
     }
   });
 </script>
@@ -145,20 +147,10 @@ import Footer from '../components/Footer.astro';
     margin-bottom: 12px;
   }
 
-  .buy-includes ul {
-    list-style: none;
-  }
-
   .buy-includes li {
     padding: 6px 0;
     font-size: 0.9rem;
     color: var(--text-secondary);
-  }
-
-  .buy-includes li::before {
-    content: '✓ ';
-    color: var(--accent);
-    font-weight: 600;
   }
 
   .buy-form {
@@ -181,13 +173,20 @@ import Footer from '../components/Footer.astro';
     background: var(--bg-secondary);
     color: var(--text-primary);
     font-size: 0.95rem;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     outline: none;
     transition: border-color var(--transition-fast);
   }
 
   .buy-form input:focus {
     border-color: var(--accent);
+  }
+
+  .form-error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin-bottom: 8px;
   }
 
   .buy-btn {

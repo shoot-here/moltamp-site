@@ -8,7 +8,7 @@ interface Props {
 
 const {
   title = 'MOLTamp — Skinnable Shell for Claude Code',
-  description = 'The cockpit UI for your AI terminal. Skins, panels, widgets, music — wraps Claude Code in a fully customizable shell. Free forever, $10 to unlock.',
+  description = 'The cockpit UI for your AI terminal. Skins, panels, widgets, music — wraps Claude Code in a fully customizable shell. Free forever, $20 to unlock.',
 } = Astro.props;
 ---
 
@@ -41,9 +41,28 @@ const {
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="/css/mini-terminal.css" />
     <title>{title}</title>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <slot />
+
+    <script>
+      // Scroll animation observer
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+    </script>
   </body>
 </html>

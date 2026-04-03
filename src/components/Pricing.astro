@@ -3,20 +3,20 @@
 
 <section id="pricing" class="section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header fade-in">
       <span class="badge">Pricing</span>
       <h2>Stupidly simple.</h2>
     </div>
 
     <div class="pricing-cards">
-      <div class="card pricing-card">
+      <div class="card pricing-card fade-in">
         <div class="pricing-tier">Free</div>
         <div class="pricing-amount">
           <span class="price">$0</span>
           <span class="price-period">forever</span>
         </div>
         <p class="pricing-desc">The whole thing. An annoying popup sometimes.</p>
-        <ul class="pricing-features">
+        <ul class="pricing-features check-list">
           <li>All skins and themes</li>
           <li>All panels and widgets</li>
           <li>Music player + visualizer</li>
@@ -28,21 +28,21 @@
         <a href="#" class="btn btn-secondary pricing-btn">Download .dmg</a>
       </div>
 
-      <div class="card pricing-card pricing-card-highlight">
+      <div class="card pricing-card pricing-card-highlight fade-in">
         <div class="pricing-popular">Support the project</div>
         <div class="pricing-tier">Unlocked</div>
         <div class="pricing-amount">
-          <span class="price">$10</span>
+          <span class="price">$20</span>
           <span class="price-period">one time</span>
         </div>
         <p class="pricing-desc">Same app. Popup is dead. Forever.</p>
-        <ul class="pricing-features">
+        <ul class="pricing-features check-list">
           <li>Everything in Free</li>
           <li>No nag popup — ever</li>
           <li>License key via email</li>
-          <li>The warm fuzzy feeling</li>
+          <li>30-day refund guarantee</li>
         </ul>
-        <a href="/buy" class="btn btn-primary pricing-btn">Unlock for $10</a>
+        <a href="/buy" class="btn btn-primary pricing-btn">Unlock for $20</a>
       </div>
     </div>
   </div>
@@ -55,6 +55,7 @@
     gap: 24px;
     max-width: 700px;
     margin: 0 auto;
+    align-items: start;
   }
 
   .pricing-card {
@@ -115,7 +116,6 @@
   }
 
   .pricing-features {
-    list-style: none;
     text-align: left;
     margin-bottom: 32px;
   }
@@ -129,12 +129,6 @@
 
   .pricing-features li:last-child {
     border-bottom: none;
-  }
-
-  .pricing-features li::before {
-    content: '✓ ';
-    color: var(--accent);
-    font-weight: 600;
   }
 
   .pricing-btn {

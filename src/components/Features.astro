@@ -35,15 +35,15 @@ const features = [
 
 <section id="features" class="section">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header fade-in">
       <span class="badge">Features</span>
       <h2>The cockpit around your terminal</h2>
       <p>MOLTamp doesn't touch Claude Code. It wraps it in chrome that actually makes you want to look at your screen.</p>
     </div>
 
-    <div class="features-grid">
+    <div class="features-grid stagger-children">
       {features.map((f) => (
-        <div class="card feature-card">
+        <div class="card feature-card fade-in">
           <div class="feature-icon" set:html={f.icon} />
           <h3>{f.title}</h3>
           <p>{f.description}</p>
