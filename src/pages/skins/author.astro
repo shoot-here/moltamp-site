@@ -7,10 +7,30 @@ import Footer from '../../components/Footer.astro';
 <BaseLayout title="Author — MOLTamp Community">
   <Nav />
   <main class="author-page">
+    <!-- Atmospheric background -->
+    <div class="scene-bg" aria-hidden="true">
+      <div class="scene-glow"></div>
+      <div class="scene-glow scene-glow--warm"></div>
+      <div class="scene-grain"></div>
+    </div>
+
     <div class="container">
-      <a href="/skins" class="back">← Gallery</a>
-      <div id="author-detail"><div class="loading">Loading author...</div></div>
-      <div class="skins-grid" id="author-skins"></div>
+      <a href="/skins" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Gallery</span>
+      </a>
+
+      <div id="author-detail">
+        <div class="loading-state">
+          <div class="loading-pulse"></div>
+          <span>Loading author...</span>
+        </div>
+      </div>
+
+      <div class="skins-section" id="skins-section" style="display:none;">
+        <div class="section-label" id="section-label"></div>
+        <div class="skins-grid" id="author-skins"></div>
+      </div>
     </div>
   </main>
   <Footer />
@@ -31,42 +51,415 @@ import Footer from '../../components/Footer.astro';
     const { author } = await res.json();
     document.title = `${author.display_name} — MOLTamp Community`;
 
-    detail.innerHTML = `<div class="aheader">
-      <div class="aavatar" style="background:var(--accent)">${author.display_name[0].toUpperCase()}</div>
-      <div><h1>${author.display_name}</h1>
-      <div class="astats"><span>Joined ${new Date(author.joined).toLocaleDateString()}</span><span>${author.skin_count} skin${author.skin_count!==1?'s':''}</span><span>${author.total_downloads} downloads</span></div>
-      </div></div>`;
+    detail.innerHTML = `<div class="author-card">
+      <div class="author-card-bar">
+        <div class="bar-dots"><i></i><i></i><i></i></div>
+        <span class="bar-path">moltamp://community/author/${author.display_name.toLowerCase().replace(/\s+/g, '-')}</span>
+      </div>
+      <div class="author-card-body">
+        <div class="author-avatar" style="background:var(--accent)">${author.display_name[0].toUpperCase()}</div>
+        <div class="author-info">
+          <h1>${author.display_name}</h1>
+          <div class="author-stats">
+            <span class="stat-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Joined ${new Date(author.joined).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            </span>
+            <span class="stat-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              ${author.skin_count} skin${author.skin_count!==1?'s':''}
+            </span>
+            <span class="stat-badge stat-badge--accent">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              ${author.total_downloads.toLocaleString()} downloads
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>`;
 
     const skinsRes = await fetch(`/api/skins?author=${encodeURIComponent(authorName)}&limit=48`);
     const data = await skinsRes.json();
-    grid.innerHTML = data.skins.map((s: any) => renderSkinCard(s)).join('');
+    const skinsSection = document.getElementById('skins-section')!;
+    const sectionLabel = document.getElementById('section-label')!;
+
+    if (data.skins.length > 0) {
+      skinsSection.style.display = 'block';
+      sectionLabel.textContent = `SKINS BY ${author.display_name.toUpperCase()}`;
+      grid.innerHTML = data.skins.map((s: any) => renderSkinCard(s)).join('');
+    }
   }
   load();
 </script>
 
 <style>
-  .author-page { padding:calc(var(--nav-height)+24px) 0 80px; }
-  .back { display:inline-block; color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px; }
-  .back:hover { color:var(--accent); }
-  .loading,.not-found { text-align:center; padding:80px 0; color:var(--text-dim); }
+  /* ── Scene ── */
+  .author-page {
+    position: relative;
+    min-height: 100vh;
+    padding: calc(var(--nav-height) + 48px) 0 80px;
+    overflow: hidden;
+  }
 
-  .aheader { display:flex; align-items:center; gap:20px; margin-bottom:32px; }
-  .aavatar { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; color:#fff; flex-shrink:0; }
-  .aheader h1 { font-size:1.6rem; margin-bottom:4px; }
-  .astats { display:flex; gap:16px; font-size:0.82rem; color:var(--text-dim); }
+  .scene-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-  .skins-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .scene-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(77, 159, 255, 0.06) 0%, transparent 70%);
+  }
+
+  .scene-glow--warm {
+    top: auto;
+    bottom: -200px;
+    left: 30%;
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255, 107, 77, 0.04) 0%, transparent 70%);
+  }
+
+  .scene-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Back link ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+    padding: 6px 12px 6px 8px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+    border-color: var(--border);
+    background: rgba(77, 159, 255, 0.04);
+  }
+
+  /* ── Loading / Error states ── */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 80px 0;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .loading-pulse {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--accent);
+    opacity: 0.3;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.15; transform: scale(0.95); }
+    50% { opacity: 0.35; transform: scale(1); }
+  }
+
+  .not-found {
+    text-align: center;
+    padding: 80px 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  .not-found a {
+    color: var(--accent);
+  }
+
+  /* ── Author card (terminal style) ── */
+  .author-card {
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(14, 14, 18, 0.75);
+    backdrop-filter: blur(24px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.3),
+      0 20px 60px rgba(0, 0, 0, 0.4),
+      0 0 80px rgba(77, 159, 255, 0.02);
+    animation: card-in 0.6s ease-out both;
+  }
+
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .author-card-bar {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .bar-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .bar-dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: block;
+  }
+
+  .bar-dots i:nth-child(1) { background: #ff5f57; }
+  .bar-dots i:nth-child(2) { background: #febc2e; }
+  .bar-dots i:nth-child(3) { background: #28c840; }
+
+  .bar-path {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+    margin-right: 30px;
+  }
+
+  .author-card-body {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 36px 40px;
+  }
+
+  /* ── Avatar ── */
+  .author-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow:
+      0 0 0 1px rgba(77, 159, 255, 0.2),
+      0 0 32px rgba(77, 159, 255, 0.15);
+  }
+
+  /* ── Author info ── */
+  .author-info {
+    min-width: 0;
+  }
+
+  .author-info h1 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, var(--text-primary) 60%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .author-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .stat-badge svg {
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  .stat-badge--accent {
+    color: var(--accent);
+    border-color: rgba(77, 159, 255, 0.2);
+    background: rgba(77, 159, 255, 0.06);
+  }
+
+  .stat-badge--accent svg {
+    opacity: 0.8;
+  }
+
+  /* ── Skins section ── */
+  .skins-section {
+    margin-top: 48px;
+    animation: fade-up 0.5s ease-out 0.3s both;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Skins grid ── */
+  .skins-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
 
   /* Card + MiniTerminal styles from /css/mini-terminal.css (.mt-sm via skin-card.js) */
-  .skin-card { display:block; position:relative; border:1px solid; border-radius:var(--radius-md); overflow:hidden; text-decoration:none; transition:transform var(--transition-fast); }
-  .skin-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.4); color:inherit; }
-  .skin-card-overlay { position:absolute; bottom:0; left:0; right:0; padding:20px 10px 6px; pointer-events:none; }
-  .skin-card-name { font-size:0.78rem; font-weight:600; }
-  .skin-card-hover { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0; transition:opacity var(--transition-fast); font-size:0.75rem; }
-  .skin-card:hover .skin-card-hover { opacity:1; }
-  .skin-card:hover .skin-card-overlay { opacity:0; }
+  .skin-card {
+    display: block;
+    position: relative;
+    border: 1px solid;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
 
-  @media (max-width:1100px) { .skins-grid { grid-template-columns:repeat(3,1fr); } }
-  @media (max-width:768px) { .skins-grid { grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:480px) { .skins-grid { grid-template-columns:1fr; } }
+  .skin-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    color: inherit;
+  }
+
+  .skin-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 12px 8px;
+    pointer-events: none;
+    transition: opacity var(--transition-fast);
+  }
+
+  .skin-card-name { font-size: 0.78rem; font-weight: 600; }
+
+  .skin-card-hover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    font-size: 0.75rem;
+  }
+
+  .skin-card:hover .skin-card-hover { opacity: 1; }
+  .skin-card:hover .skin-card-overlay { opacity: 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1100px) {
+    .skins-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .skins-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .author-card-body {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 28px 24px;
+    }
+
+    .author-avatar {
+      width: 72px;
+      height: 72px;
+      font-size: 1.8rem;
+      border-radius: 14px;
+    }
+
+    .bar-path {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .skins-grid { grid-template-columns: 1fr; }
+
+    .author-stats {
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-badge {
+      width: fit-content;
+    }
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .author-card {
+      animation: none;
+    }
+
+    .skins-section {
+      animation: none;
+    }
+
+    .loading-pulse {
+      animation: none;
+      opacity: 0.25;
+    }
+  }
 </style>

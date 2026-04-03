@@ -46,8 +46,8 @@ import Nav from '../components/Nav.astro';
         <span class="lc-path">moltamp://community/auth</span>
       </div>
       <div class="lc-body">
-        <h1>Sign in<span class="caret">_</span></h1>
-        <p class="lc-sub">Authenticate with your license key to upload, rate, and download community skins.</p>
+        <h1 id="login-heading">Sign in<span class="caret">_</span></h1>
+        <p class="lc-sub" id="login-sub">Authenticate with your license key to upload, rate, and download community skins.</p>
 
         <form id="login-form">
           <div class="field">
@@ -94,11 +94,58 @@ import Nav from '../components/Nav.astro';
   const form = document.getElementById('login-form') as HTMLFormElement;
   const btn = document.getElementById('login-btn') as HTMLButtonElement;
   const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  const displayField = document.getElementById('display_name')!.closest('.field') as HTMLElement;
+  const heading = document.getElementById('login-heading')!;
+  const sub = document.getElementById('login-sub')!;
+
+  let isReturningUser = false;
 
   // Redirect if already logged in
   fetch('/api/auth/me').then(r => {
     if (r.ok) window.location.href = '/dashboard';
   });
+
+  // Restore saved email from last login
+  const savedEmail = localStorage.getItem('moltamp_email');
+  if (savedEmail) {
+    emailInput.value = savedEmail;
+    checkReturningUser(savedEmail);
+  }
+
+  // Check if user exists when email field loses focus
+  let checkTimeout: ReturnType<typeof setTimeout>;
+  emailInput.addEventListener('input', () => {
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(() => {
+      const email = emailInput.value.trim();
+      if (email && email.includes('@')) checkReturningUser(email);
+    }, 400);
+  });
+
+  async function checkReturningUser(email: string) {
+    try {
+      const res = await fetch('/api/auth/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (data.exists) {
+        isReturningUser = true;
+        heading.innerHTML = `Welcome back<span class="caret">_</span>`;
+        sub.textContent = `Sign in as ${data.display_name}. Just enter your license key.`;
+        displayField.style.display = 'none';
+      } else {
+        isReturningUser = false;
+        heading.innerHTML = `Sign in<span class="caret">_</span>`;
+        sub.textContent = 'Authenticate with your license key to upload, rate, and download community skins.';
+        displayField.style.display = '';
+      }
+    } catch {
+      // Silently fail — form still works without this check
+    }
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -106,12 +153,14 @@ import Nav from '../components/Nav.astro';
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'authenticating...';
 
+    const email = emailInput.value.trim();
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: (document.getElementById('email') as HTMLInputElement).value,
+          email,
           license_key: (document.getElementById('license_key') as HTMLInputElement).value,
           display_name: (document.getElementById('display_name') as HTMLInputElement).value || undefined,
         }),
@@ -120,6 +169,8 @@ import Nav from '../components/Nav.astro';
       const data = await res.json();
 
       if (data.success) {
+        // Remember email for next time
+        localStorage.setItem('moltamp_email', email);
         btn.querySelector('span')!.textContent = 'redirecting...';
         window.location.href = '/dashboard';
       } else {

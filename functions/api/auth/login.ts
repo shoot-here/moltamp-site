@@ -57,6 +57,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonError('Failed to create user', 500);
   }
 
+  // Update display name if provided and different
+  if (displayName && displayName !== user.display_name) {
+    await DB.prepare(`UPDATE users SET display_name = ? WHERE id = ?`)
+      .bind(displayName, user.id)
+      .run();
+    user.display_name = displayName;
+  }
+
   // Clean up expired sessions for this user
   await DB.prepare(
     `DELETE FROM sessions WHERE user_id = ? AND expires_at < datetime('now')`,
@@ -64,23 +72,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     .bind(user.id)
     .run();
 
-  // Create new session
+  // Create new session (90 days)
   const sessionId = generateSessionId();
   const ip = context.request.headers.get('CF-Connecting-IP') ?? '';
   const ua = context.request.headers.get('User-Agent') ?? '';
 
   await DB.prepare(
     `INSERT INTO sessions (id, user_id, expires_at, ip_address, user_agent)
-     VALUES (?, ?, datetime('now', '+30 days'), ?, ?)`,
+     VALUES (?, ?, datetime('now', '+90 days'), ?, ?)`,
   )
     .bind(sessionId, user.id, ip, ua)
     .run();
 
-  // Set cookie (30 days = 2592000 seconds)
+  // Set cookie (90 days = 7776000 seconds)
   const response = jsonOk({
     success: true,
     user: { id: user.id, email: user.email, display_name: user.display_name },
   });
 
-  return setCookie(response, 'moltamp_session', sessionId, 2592000);
+  return setCookie(response, 'moltamp_session', sessionId, 7776000);
 };
