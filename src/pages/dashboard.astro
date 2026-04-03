@@ -714,14 +714,17 @@ import Footer from '../components/Footer.astro';
   .sk-card:hover { border-color: var(--border-hover); }
 
   .sk-thumb {
-    width: 100px;
+    width: 80px;
+    height: 80px;
     flex-shrink: 0;
     display: block;
-    border-right: 1px solid rgba(255,255,255,0.04);
+    overflow: hidden;
   }
 
   .sk-thumb .mini-terminal {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: unset !important;
+    width: 80px;
+    height: 80px;
   }
 
   .sk-body {
