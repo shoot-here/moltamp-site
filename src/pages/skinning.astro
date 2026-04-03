@@ -1,0 +1,516 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="Skinning Guide — MOLTamp">
+  <Nav />
+  <main class="docs-page">
+    <div class="container">
+      <div class="docs-content">
+        <h1>Skinning Guide <span class="version">v2.0</span></h1>
+        <p class="docs-intro">Everything you need to build a MOLTamp skin. A skin is a folder with a JSON manifest and a CSS theme. No JavaScript, no build tools.</p>
+
+        <nav class="docs-toc">
+          <h3>Contents</h3>
+          <ol>
+            <li><a href="#quick-start">Quick Start</a></li>
+            <li><a href="#rules">The Rules</a></li>
+            <li><a href="#format">Skin Format</a></li>
+            <li><a href="#variables">Variable Contract</a></li>
+            <li><a href="#elements">Targetable Elements</a></li>
+            <li><a href="#vibes">The Vibes Panel</a></li>
+            <li><a href="#reactive">Reactive Data</a></li>
+            <li><a href="#animations">Animations</a></li>
+            <li><a href="#sharing">Sharing</a></li>
+            <li><a href="#checklist">Checklist</a></li>
+          </ol>
+        </nav>
+
+        <!-- Quick Start -->
+        <section id="quick-start">
+          <h2>Quick Start</h2>
+          <pre><code>cp -r ~/Moltamp/skins/_template ~/Moltamp/skins/my-skin</code></pre>
+          <ol>
+            <li>Edit <code>skin.json</code> with your info</li>
+            <li>Edit <code>theme.css</code> — set your palette in <code>:root</code>, style elements with <code>var()</code></li>
+            <li>Drop art in <code>assets/</code>, reference as <code>url('./assets/file.ext')</code></li>
+            <li>Open MOLTamp Settings &rarr; Skins, select your skin</li>
+          </ol>
+        </section>
+
+        <!-- Rules -->
+        <section id="rules">
+          <h2>The Rules</h2>
+          <p>Non-negotiable. The validator enforces them.</p>
+
+          <h3>1. All colors live in <code>:root</code></h3>
+          <p>Every color value must be a CSS variable in <code>:root</code>. Never hardcode a color in a selector.</p>
+          <pre><code>/* WRONG */
+.moltamp-panel-left &#123; background: #070b07; &#125;
+
+/* RIGHT */
+:root &#123; --skin-panel-bg: #070b07; &#125;
+.moltamp-panel-left &#123; background: var(--skin-panel-bg); &#125;</code></pre>
+          <p class="why">Why: Color overrides inject a <code>:root</code> block on top of your skin. Hardcoded colors can't be reached.</p>
+
+          <h3>2. Contract variables come first</h3>
+          <p>The 6 chrome and 21 terminal variables are the <strong>contract</strong>. Override them in <code>:root</code>. Extend with <code>--skin-*</code> prefixed variables.</p>
+
+          <h3>3. Never hide panels</h3>
+          <p>No <code>display: none</code> on panels. Users toggle visibility in Settings. Style them freely — visibility is the user's choice.</p>
+
+          <h3>4. No executable content</h3>
+          <ul>
+            <li>No external URLs (<code>https:</code>, <code>http:</code>)</li>
+            <li>No <code>@import</code></li>
+            <li>No <code>expression()</code>, <code>javascript:</code></li>
+            <li>CSS only. Zero JS.</li>
+          </ul>
+
+          <h3>5. Don't hide the permission dialog</h3>
+          <p>These trigger validator warnings: <code>visibility: hidden</code>, <code>opacity: 0</code>, <code>pointer-events: none</code></p>
+
+          <h3>6. Assets stay in <code>assets/</code></h3>
+          <ul>
+            <li>Reference with <code>url('./assets/filename.ext')</code></li>
+            <li>Supported: PNG, JPG, WebP, GIF, SVG, AVIF</li>
+            <li>Max 5MB per file, 20MB per skin</li>
+            <li>No nested directories, no path traversal</li>
+          </ul>
+        </section>
+
+        <!-- Format -->
+        <section id="format">
+          <h2>Skin Format</h2>
+          <pre><code>skins/my-skin/
+  skin.json          &larr; Required: manifest
+  theme.css          &larr; Required: all styles
+  assets/            &larr; Optional: images, GIFs, SVGs</code></pre>
+
+          <h3>skin.json</h3>
+          <pre><code>&#123;
+  "id": "my-skin",
+  "name": "My Skin",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "description": "A short description.",
+  "engine": "1.0"
+&#125;</code></pre>
+          <p>All fields required. <code>id</code> must match <code>^[a-zA-Z0-9_-]+$</code>.</p>
+        </section>
+
+        <!-- Variables -->
+        <section id="variables">
+          <h2>Variable Contract</h2>
+          <p>Override these in <code>:root</code>. This is the API between MOLTamp and your skin.</p>
+
+          <h3>Terminal Colors (21 vars)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Variable</th><th>Purpose</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td><code>--t-foreground</code></td><td>Main text</td><td><code>#e0e0e8</code></td></tr>
+                <tr><td><code>--t-background</code></td><td>Terminal background</td><td><code>#0a0a0f</code></td></tr>
+                <tr><td><code>--t-cursor</code></td><td>Cursor color</td><td><code>#d4a036</code></td></tr>
+                <tr><td><code>--t-cursor-accent</code></td><td>Cursor text when selected</td><td><code>#0a0a0f</code></td></tr>
+                <tr><td><code>--t-selection</code></td><td>Selection highlight</td><td><code>rgba(212,160,54,0.25)</code></td></tr>
+                <tr><td><code>--t-black</code></td><td>ANSI 0</td><td><code>#1a1a2e</code></td></tr>
+                <tr><td><code>--t-red</code></td><td>ANSI 1</td><td><code>#d43636</code></td></tr>
+                <tr><td><code>--t-green</code></td><td>ANSI 2</td><td><code>#36d480</code></td></tr>
+                <tr><td><code>--t-yellow</code></td><td>ANSI 3</td><td><code>#d4a036</code></td></tr>
+                <tr><td><code>--t-blue</code></td><td>ANSI 4</td><td><code>#3678d4</code></td></tr>
+                <tr><td><code>--t-magenta</code></td><td>ANSI 5</td><td><code>#a036d4</code></td></tr>
+                <tr><td><code>--t-cyan</code></td><td>ANSI 6</td><td><code>#36b5d4</code></td></tr>
+                <tr><td><code>--t-white</code></td><td>ANSI 7</td><td><code>#e0e0e8</code></td></tr>
+                <tr><td><code>--t-bright-black</code></td><td>ANSI 8</td><td><code>#3a3a52</code></td></tr>
+                <tr><td><code>--t-bright-red</code></td><td>ANSI 9</td><td><code>#ff5555</code></td></tr>
+                <tr><td><code>--t-bright-green</code></td><td>ANSI 10</td><td><code>#50fa7b</code></td></tr>
+                <tr><td><code>--t-bright-yellow</code></td><td>ANSI 11</td><td><code>#f1c232</code></td></tr>
+                <tr><td><code>--t-bright-blue</code></td><td>ANSI 12</td><td><code>#6299e6</code></td></tr>
+                <tr><td><code>--t-bright-magenta</code></td><td>ANSI 13</td><td><code>#c678dd</code></td></tr>
+                <tr><td><code>--t-bright-cyan</code></td><td>ANSI 14</td><td><code>#56d4ef</code></td></tr>
+                <tr><td><code>--t-bright-white</code></td><td>ANSI 15</td><td><code>#ffffff</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Chrome Colors (6 vars)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Variable</th><th>Purpose</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td><code>--c-chrome-bg</code></td><td>Panel backgrounds</td><td><code>#0a0a0f</code></td></tr>
+                <tr><td><code>--c-chrome-text</code></td><td>UI text</td><td><code>#9898a8</code></td></tr>
+                <tr><td><code>--c-chrome-border</code></td><td>Borders, dividers</td><td><code>#1a1a2e</code></td></tr>
+                <tr><td><code>--c-chrome-accent</code></td><td>Highlights, active</td><td><code>#d4a036</code></td></tr>
+                <tr><td><code>--c-chrome-dim</code></td><td>Muted text</td><td><code>#606070</code></td></tr>
+                <tr><td><code>--c-chrome-hover</code></td><td>Hover backgrounds</td><td><code>#1e1e32</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Effects (6 vars)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Variable</th><th>Type</th><th>Purpose</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td><code>--effect-scanlines</code></td><td>0 or 1</td><td>Scanline overlay</td><td><code>0</code></td></tr>
+                <tr><td><code>--effect-glow</code></td><td>0 or 1</td><td>Inner glow</td><td><code>0</code></td></tr>
+                <tr><td><code>--effect-crt</code></td><td>0 or 1</td><td>CRT curvature</td><td><code>0</code></td></tr>
+                <tr><td><code>--scanline-opacity</code></td><td>0-1</td><td>Scanline intensity</td><td><code>0.04</code></td></tr>
+                <tr><td><code>--glow-intensity</code></td><td>pixels</td><td>Glow blur</td><td><code>12px</code></td></tr>
+                <tr><td><code>--c-glow</code></td><td>color</td><td>Glow color</td><td><code>rgba(212,160,54,0.15)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Typography &amp; Layout</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Variable</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td><code>--font-terminal</code></td><td><code>'SF Mono', monospace</code></td></tr>
+                <tr><td><code>--font-chrome</code></td><td><code>'Inter', sans-serif</code></td></tr>
+                <tr><td><code>--font-size</code></td><td><code>14px</code></td></tr>
+                <tr><td><code>--radius</code></td><td><code>4px</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Elements -->
+        <section id="elements">
+          <h2>Targetable Elements</h2>
+
+          <h3>Layout</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Class</th><th>What</th></tr></thead>
+              <tbody>
+                <tr><td><code>.moltamp-shell</code></td><td>Root container</td></tr>
+                <tr><td><code>.moltamp-titlebar</code></td><td>Top title bar</td></tr>
+                <tr><td><code>.moltamp-vibes</code></td><td>Top banner — your canvas</td></tr>
+                <tr><td><code>.moltamp-panel-left</code></td><td>Left panel (Intel)</td></tr>
+                <tr><td><code>.moltamp-panel-right</code></td><td>Right panel (Signal)</td></tr>
+                <tr><td><code>.moltamp-panel-bottom</code></td><td>Bottom bar (Telemetry)</td></tr>
+                <tr><td><code>.moltamp-statusbar</code></td><td>Status bar</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Terminal</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Class</th><th>What</th></tr></thead>
+              <tbody>
+                <tr><td><code>.moltamp-terminal</code></td><td>Terminal container</td></tr>
+                <tr><td><code>.moltamp-message-user</code></td><td>User messages</td></tr>
+                <tr><td><code>.moltamp-message-assistant</code></td><td>Assistant messages</td></tr>
+                <tr><td><code>.moltamp-tool-call</code></td><td>Tool call blocks</td></tr>
+                <tr><td><code>.moltamp-thinking</code></td><td>Thinking blocks</td></tr>
+                <tr><td><code>.moltamp-code-block</code></td><td>Code blocks</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Vibes -->
+        <section id="vibes">
+          <h2>The Vibes Panel</h2>
+          <p>The <code>.moltamp-vibes</code> div is your hero canvas.</p>
+          <pre><code>.moltamp-vibes &#123;
+  min-height: 60px;
+  background-image: url('./assets/vibes.gif');
+  background-size: cover;
+&#125;</code></pre>
+          <p>Use <code>::before</code> and <code>::after</code> for overlays:</p>
+          <pre><code>.moltamp-vibes::before &#123;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--skin-overlay);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+&#125;</code></pre>
+        </section>
+
+        <!-- Reactive -->
+        <section id="reactive">
+          <h2>Reactive Data Attributes</h2>
+          <p>Set on <code>.moltamp-shell</code> — changes with Claude's state.</p>
+
+          <h3>Activity Level</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Value</th><th>Meaning</th><th>Use for</th></tr></thead>
+              <tbody>
+                <tr><td><code>data-activity="idle"</code></td><td>No output</td><td>Dim, calm</td></tr>
+                <tr><td><code>data-activity="low"</code></td><td>Some output</td><td>Moderate</td></tr>
+                <tr><td><code>data-activity="high"</code></td><td>Streaming</td><td>Bright, intense</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Shell State</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Value</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>idle</code></td><td>Waiting for input</td></tr>
+                <tr><td><code>thinking</code></td><td>Claude is reasoning</td></tr>
+                <tr><td><code>streaming</code></td><td>Outputting text</td></tr>
+                <tr><td><code>tool-use</code></td><td>Calling a tool</td></tr>
+                <tr><td><code>permission</code></td><td>Waiting for permission</td></tr>
+                <tr><td><code>error</code></td><td>Something broke</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Live CSS Properties</h3>
+          <p>Set on <code>.moltamp-shell</code> for data-driven visuals:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Property</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>--data-context-pct</code></td><td>Context window used %</td></tr>
+                <tr><td><code>--data-cost-cents</code></td><td>Session cost in cents</td></tr>
+                <tr><td><code>--data-tokens-in</code></td><td>Input tokens (thousands)</td></tr>
+                <tr><td><code>--data-tokens-out</code></td><td>Output tokens (thousands)</td></tr>
+                <tr><td><code>--data-rate-5h</code></td><td>5-hour rate limit %</td></tr>
+                <tr><td><code>--data-agents</code></td><td>Active subagent count</td></tr>
+                <tr><td><code>--data-git-changed</code></td><td>Changed file count</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Example:</strong> Context gauge as pie chart:</p>
+          <pre><code>.moltamp-context-gauge &#123;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--c-chrome-accent) calc(var(--data-context-pct) * 1%),
+    var(--c-chrome-border) 0
+  );
+&#125;</code></pre>
+        </section>
+
+        <!-- Animations -->
+        <section id="animations">
+          <h2>Reactive Animations</h2>
+          <p>Bind animations to data attributes:</p>
+          <pre><code>[data-activity="high"] .moltamp-vibes &#123;
+  filter: brightness(1.2) saturate(1.1);
+  animation: skin-glow 2s ease-in-out infinite;
+&#125;
+
+[data-shell-state="thinking"] .moltamp-vibes &#123;
+  animation: skin-pulse 1.5s ease-in-out infinite;
+&#125;
+
+[data-shell-state="error"] .moltamp-vibes &#123;
+  box-shadow: inset 0 0 20px var(--skin-error-color);
+&#125;</code></pre>
+          <p>Prefer <code>transform</code> and <code>opacity</code> for performance. Keep durations under 5s.</p>
+        </section>
+
+        <!-- Sharing -->
+        <section id="sharing">
+          <h2>Sharing</h2>
+          <p><strong>Export:</strong> Settings &rarr; Skins &rarr; Export — saves as <code>.moltamp</code> (zip)</p>
+          <p><strong>Import:</strong> Settings &rarr; Skins &rarr; Import — select <code>.moltamp</code> or <code>.zip</code></p>
+        </section>
+
+        <!-- Checklist -->
+        <section id="checklist">
+          <h2>Pre-Share Checklist</h2>
+          <ul class="checklist">
+            <li>All colors defined as variables in <code>:root</code></li>
+            <li>Zero hardcoded hex/rgb outside <code>:root</code></li>
+            <li>Contract variables (<code>--c-*</code>, <code>--t-*</code>) overridden</li>
+            <li>Custom variables use <code>--skin-*</code> prefix</li>
+            <li>No external URLs or <code>@import</code></li>
+            <li>Assets under 5MB each, 20MB total</li>
+            <li>Tested at different panel sizes</li>
+            <li>Permission dialog still visible</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .docs-page {
+    padding: calc(var(--nav-height) + 40px) 0 80px;
+  }
+
+  .docs-content {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+  }
+
+  .version {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .docs-intro {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+
+  .docs-toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+  }
+
+  .docs-toc h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .docs-toc ol {
+    padding-left: 20px;
+    columns: 2;
+  }
+
+  .docs-toc li {
+    padding: 3px 0;
+    font-size: 0.9rem;
+  }
+
+  .docs-toc a {
+    color: var(--text-secondary);
+  }
+
+  .docs-toc a:hover {
+    color: var(--accent);
+  }
+
+  section {
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+  }
+
+  p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .why {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  ul, ol {
+    color: var(--text-secondary);
+    padding-left: 20px;
+    margin-bottom: 16px;
+  }
+
+  li {
+    padding: 3px 0;
+    line-height: 1.6;
+  }
+
+  pre {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+
+  p code, li code, td code {
+    background: var(--bg-card);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    font-size: 0.82em;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .checklist {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .checklist li::before {
+    content: '\2610  ';
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .docs-toc ol {
+      columns: 1;
+    }
+  }
+</style>
