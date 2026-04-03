@@ -12,6 +12,19 @@ import Footer from '../components/Footer.astro';
 
 <BaseLayout>
   <Nav />
+
+  <!-- Scroll parallax floating terminals -->
+  <div class="parallax-bg" aria-hidden="true">
+    <div class="pfx" data-speed="0.15" style="left:3%;top:120px"><div class="pfx-inner" style="--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--rot:-6deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>blade-runner</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:70%;background:var(--accent)"></s><s style="width:45%"></s></div></div></div>
+    <div class="pfx" data-speed="0.25" style="right:5%;top:200px"><div class="pfx-inner" style="--accent:#3b82f6;--bg:#0a0e1a;--term:#080c16;--rot:4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-space</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:55%"></s><s style="width:80%;background:var(--accent)"></s></div></div></div>
+    <div class="pfx" data-speed="0.08" style="left:8%;top:900px"><div class="pfx-inner" style="--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--rot:-3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:60%"></s><s style="width:40%"></s></div></div></div>
+    <div class="pfx" data-speed="0.2" style="right:3%;top:1400px"><div class="pfx-inner" style="--accent:#ff9900;--bg:#000;--term:#0a0a00;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lcars</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:90%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:70%"></s></div></div></div>
+    <div class="pfx" data-speed="0.12" style="left:5%;top:2000px"><div class="pfx-inner" style="--accent:#67e8f9;--bg:#0c1929;--term:#091422;--rot:-4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>ice-nine</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:40%"></s></div></div></div>
+    <div class="pfx" data-speed="0.3" style="right:8%;top:2600px"><div class="pfx-inner" style="--accent:#a78bfa;--bg:#111116;--term:#0d0d12;--rot:3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lunar</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:55%;background:var(--accent)"></s><s style="width:85%"></s></div></div></div>
+    <div class="pfx" data-speed="0.18" style="left:85%;top:3200px"><div class="pfx-inner" style="--accent:#f472b6;--bg:#1f1218;--term:#190e14;--rot:-5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>neon-horizon</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:60%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:45%"></s></div></div></div>
+    <div class="pfx" data-speed="0.1" style="left:2%;top:3800px"><div class="pfx-inner" style="--accent:#fbbf24;--bg:#121008;--term:#0e0c06;--rot:2deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>kosmos</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:65%;background:var(--accent)"></s><s style="width:50%"></s></div></div></div>
+  </div>
+
   <main id="main-content">
     <Hero />
     <Features />
@@ -21,4 +34,111 @@ import Footer from '../components/Footer.astro';
     <FAQ />
   </main>
   <Footer />
+
+  <style is:global>
+    .parallax-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    #main-content { position: relative; z-index: 1; }
+
+    .pfx {
+      position: absolute;
+      width: 150px;
+      opacity: 0.3;
+      will-change: transform;
+    }
+
+    .pfx-inner {
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+      box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 6%, transparent);
+      overflow: hidden;
+      transform: rotate(var(--rot));
+    }
+
+    .pfx-bar {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 5px 8px;
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    .pfx-bar i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .pfx-bar span {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.4rem;
+      color: color-mix(in srgb, var(--accent) 50%, transparent);
+      letter-spacing: 0.05em;
+    }
+
+    .pfx-term {
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .pfx-term s {
+      display: block;
+      height: 2px;
+      width: 80%;
+      border-radius: 1px;
+      background: color-mix(in srgb, var(--accent) 25%, transparent);
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .pfx { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pfx { display: none; }
+    }
+  </style>
+
+  <script>
+    const pfxEls = document.querySelectorAll<HTMLElement>('.pfx');
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (pfxEls.length > 0 && !prefersReduced) {
+      let ticking = false;
+
+      function updateParallax() {
+        const scrollY = window.scrollY;
+        pfxEls.forEach(el => {
+          const speed = parseFloat(el.dataset.speed || '0.1');
+          const y = -scrollY * speed;
+          el.style.transform = `translateY(${y}px)`;
+        });
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      }, { passive: true });
+
+      updateParallax();
+    }
+  </script>
 </BaseLayout>
