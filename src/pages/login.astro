@@ -106,6 +106,12 @@ import Nav from '../components/Nav.astro';
     if (r.ok) window.location.href = '/dashboard';
   });
 
+  // Show message if kicked by session limit
+  if (new URLSearchParams(window.location.search).get('reason') === 'session_expired') {
+    errorEl.textContent = 'You were signed out — your account was used on another device.';
+    errorEl.style.color = '#f59e0b';
+  }
+
   // Restore saved email from last login
   const savedEmail = localStorage.getItem('moltamp_email');
   if (savedEmail) {

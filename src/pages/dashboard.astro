@@ -143,7 +143,7 @@ import Footer from '../components/Footer.astro';
 
   async function checkAuth() {
     const res = await fetch('/api/auth/me');
-    if (!res.ok) { window.location.href = '/login'; return; }
+    if (!res.ok) { window.location.href = '/login?reason=session_expired'; return; }
     const data = await res.json();
     currentUser = data.user;
     document.getElementById('dash-user')!.textContent = `${data.user.display_name} \u00B7 ${data.user.email}`;
