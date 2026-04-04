@@ -15,37 +15,25 @@ import Footer from '../components/Footer.astro';
 
   <!-- Scroll parallax floating terminals -->
   <div class="parallax-bg" aria-hidden="true">
-    <!-- BACK — slow, large, ghostly -->
-    <div class="pfx pfx-lg" data-speed="0.04" style="left:1%;top:500px"><div class="pfx-inner" style="--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--rot:-4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>blade-runner</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:70%;background:var(--accent)"></s><s style="width:45%"></s><s style="width:60%"></s></div></div></div>
-    <div class="pfx pfx-lg" data-speed="0.06" style="right:1%;top:1600px"><div class="pfx-inner" style="--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--rot:3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:60%"></s><s style="width:40%"></s><s style="width:75%"></s></div></div></div>
-    <div class="pfx pfx-lg" data-speed="0.05" style="left:2%;top:2800px"><div class="pfx-inner" style="--accent:#fbbf24;--bg:#121008;--term:#0e0c06;--rot:-2deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>kosmos</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:65%;background:var(--accent)"></s><s style="width:50%"></s><s style="width:80%"></s></div></div></div>
-    <div class="pfx pfx-lg" data-speed="0.07" style="right:2%;top:4200px"><div class="pfx-inner" style="--accent:#3b82f6;--bg:#0a0e1a;--term:#080c16;--rot:2deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-space</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:55%"></s><s style="width:80%;background:var(--accent)"></s><s style="width:40%"></s></div></div></div>
-    <div class="pfx pfx-lg" data-speed="0.05" style="left:0%;top:5400px"><div class="pfx-inner" style="--accent:#ef4444;--bg:#1a0808;--term:#140606;--rot:-3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-claw</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:55%;background:var(--accent)"></s><s style="width:70%"></s><s style="width:40%"></s><s style="width:60%"></s></div></div></div>
+    <!-- Layer 1: slow, big, subtle — deep background -->
+    <div class="pfx pfx-lg" data-speed="0.06" style="left:1%;top:600px"><div class="pfx-inner" style="--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--rot:-4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>blade-runner</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:70%;background:var(--accent)"></s><s style="width:45%"></s><s style="width:60%"></s></div></div></div>
+    <div class="pfx pfx-lg" data-speed="0.07" style="right:2%;top:1800px"><div class="pfx-inner" style="--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--rot:3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:60%"></s><s style="width:40%"></s><s style="width:75%"></s></div></div></div>
+    <div class="pfx pfx-lg" data-speed="0.05" style="left:3%;top:3400px"><div class="pfx-inner" style="--accent:#fbbf24;--bg:#121008;--term:#0e0c06;--rot:-2deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>kosmos</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:65%;background:var(--accent)"></s><s style="width:50%"></s><s style="width:80%"></s></div></div></div>
 
-    <!-- MID — medium speed, normal size -->
-    <div class="pfx" data-speed="0.14" style="right:4%;top:300px"><div class="pfx-inner" style="--accent:#67e8f9;--bg:#0c1929;--term:#091422;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>ice-nine</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:40%"></s></div></div></div>
-    <div class="pfx" data-speed="0.18" style="left:5%;top:900px"><div class="pfx-inner" style="--accent:#ff9900;--bg:#000;--term:#0a0a00;--rot:-5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lcars</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:90%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:70%"></s></div></div></div>
-    <div class="pfx" data-speed="0.12" style="right:6%;top:1400px"><div class="pfx-inner" style="--accent:#8b5cf6;--bg:#0e0a1a;--term:#0a0816;--rot:4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>obsidian</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:65%"></s></div></div></div>
-    <div class="pfx" data-speed="0.16" style="left:4%;top:2000px"><div class="pfx-inner" style="--accent:#14b8a6;--bg:#0a1210;--term:#070e0c;--rot:-3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>biodiagnostic</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:70%;background:var(--accent)"></s><s style="width:50%"></s><s style="width:40%"></s></div></div></div>
-    <div class="pfx" data-speed="0.15" style="right:3%;top:2600px"><div class="pfx-inner" style="--accent:#f472b6;--bg:#1f1218;--term:#190e14;--rot:6deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>neon-horizon</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:60%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:45%"></s></div></div></div>
-    <div class="pfx" data-speed="0.13" style="left:6%;top:3200px"><div class="pfx-inner" style="--accent:#06b6d4;--bg:#060d10;--term:#040a0d;--rot:-4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>custom</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:55%"></s><s style="width:70%;background:var(--accent)"></s><s style="width:50%"></s></div></div></div>
-    <div class="pfx" data-speed="0.17" style="right:5%;top:3800px"><div class="pfx-inner" style="--accent:#fb923c;--bg:#141008;--term:#100c06;--rot:3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>my-skin</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:80%"></s><s style="width:45%;background:var(--accent)"></s><s style="width:65%"></s></div></div></div>
-    <div class="pfx" data-speed="0.14" style="left:3%;top:4400px"><div class="pfx-inner" style="--accent:#a3e635;--bg:#0c0f08;--term:#0a0c06;--rot:-5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>matrix</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:55%"></s><s style="width:70%"></s></div></div></div>
-    <div class="pfx" data-speed="0.19" style="right:4%;top:5000px"><div class="pfx-inner" style="--accent:#e879f9;--bg:#150a18;--term:#110814;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>vapor</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:45%"></s><s style="width:80%"></s></div></div></div>
-    <div class="pfx" data-speed="0.11" style="left:5%;top:5600px"><div class="pfx-inner" style="--accent:#38bdf8;--bg:#08101a;--term:#060c16;--rot:-2deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>arctic</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:55%;background:var(--accent)"></s><s style="width:40%"></s></div></div></div>
+    <!-- Layer 2: medium speed -->
+    <div class="pfx" data-speed="0.15" style="right:4%;top:400px"><div class="pfx-inner" style="--accent:#3b82f6;--bg:#0a0e1a;--term:#080c16;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-space</span></div><div class="pfx-term" style="background:var(--term)"><s></s><s style="width:55%"></s><s style="width:80%;background:var(--accent)"></s></div></div></div>
+    <div class="pfx" data-speed="0.12" style="left:6%;top:1200px"><div class="pfx-inner" style="--accent:#67e8f9;--bg:#0c1929;--term:#091422;--rot:-5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>ice-nine</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:80%"></s><s style="width:40%"></s></div></div></div>
+    <div class="pfx" data-speed="0.18" style="right:6%;top:2200px"><div class="pfx-inner" style="--accent:#ff9900;--bg:#000;--term:#0a0a00;--rot:4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lcars</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:90%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:70%"></s></div></div></div>
+    <div class="pfx" data-speed="0.14" style="left:4%;top:2800px"><div class="pfx-inner" style="--accent:#ef4444;--bg:#1a0808;--term:#140606;--rot:-3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>deep-claw</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:55%;background:var(--accent)"></s><s style="width:70%"></s><s style="width:40%"></s></div></div></div>
+    <div class="pfx" data-speed="0.16" style="right:5%;top:3600px"><div class="pfx-inner" style="--accent:#8b5cf6;--bg:#0e0a1a;--term:#0a0816;--rot:6deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>obsidian</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:50%;background:var(--accent)"></s><s style="width:65%"></s></div></div></div>
 
-    <!-- FRONT — fast, small, vivid -->
-    <div class="pfx pfx-sm" data-speed="0.3" style="left:14%;top:200px"><div class="pfx-inner" style="--accent:#a78bfa;--bg:#111116;--term:#0d0d12;--rot:7deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lunar</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:55%;background:var(--accent)"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.35" style="right:10%;top:700px"><div class="pfx-inner" style="--accent:#f472b6;--bg:#1f1218;--term:#190e14;--rot:-8deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>neon</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:60%;background:var(--accent)"></s><s style="width:80%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.28" style="left:10%;top:1200px"><div class="pfx-inner" style="--accent:#4ade80;--bg:#0a120a;--term:#080e08;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor-2</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:55%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.4" style="right:12%;top:1700px"><div class="pfx-inner" style="--accent:#fbbf24;--bg:#121008;--term:#0e0c06;--rot:-6deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>amber</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:70%;background:var(--accent)"></s><s style="width:50%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.32" style="left:88%;top:2200px"><div class="pfx-inner" style="--accent:#ff6b2b;--bg:#0d0d0f;--term:#0a0a0c;--rot:4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>ember</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:80%"></s><s style="width:45%;background:var(--accent)"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.36" style="left:12%;top:2700px"><div class="pfx-inner" style="--accent:#67e8f9;--bg:#0c1929;--term:#091422;--rot:-7deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>frost</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:40%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.25" style="right:14%;top:3300px"><div class="pfx-inner" style="--accent:#ef4444;--bg:#1a0808;--term:#140606;--rot:8deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>claw</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:55%;background:var(--accent)"></s><s style="width:70%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.38" style="left:15%;top:3900px"><div class="pfx-inner" style="--accent:#22c55e;--bg:#0a0f0a;--term:#070c07;--rot:-5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>terminal</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:60%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.33" style="right:11%;top:4500px"><div class="pfx-inner" style="--accent:#8b5cf6;--bg:#0e0a1a;--term:#0a0816;--rot:6deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>void</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%;background:var(--accent)"></s><s style="width:50%"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.42" style="left:10%;top:5100px"><div class="pfx-inner" style="--accent:#ff9900;--bg:#000;--term:#0a0a00;--rot:-3deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>trek</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:90%"></s><s style="width:40%;background:var(--accent)"></s></div></div></div>
-    <div class="pfx pfx-sm" data-speed="0.29" style="right:13%;top:5700px"><div class="pfx-inner" style="--accent:#e879f9;--bg:#150a18;--term:#110814;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>glow</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:65%;background:var(--accent)"></s><s style="width:55%"></s></div></div></div>
+    <!-- Layer 3: fast, small — foreground feel -->
+    <div class="pfx pfx-sm" data-speed="0.3" style="left:15%;top:300px"><div class="pfx-inner" style="--accent:#a78bfa;--bg:#111116;--term:#0d0d12;--rot:7deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>lunar</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:75%"></s><s style="width:55%;background:var(--accent)"></s></div></div></div>
+    <div class="pfx pfx-sm" data-speed="0.35" style="right:12%;top:1000px"><div class="pfx-inner" style="--accent:#f472b6;--bg:#1f1218;--term:#190e14;--rot:-8deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>neon-horizon</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:60%;background:var(--accent)"></s><s style="width:80%"></s></div></div></div>
+    <div class="pfx pfx-sm" data-speed="0.28" style="left:12%;top:1800px"><div class="pfx-inner" style="--accent:#14b8a6;--bg:#0a1210;--term:#070e0c;--rot:5deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>biodiagnostic</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:70%;background:var(--accent)"></s><s style="width:50%"></s></div></div></div>
+    <div class="pfx pfx-sm" data-speed="0.32" style="right:15%;top:2600px"><div class="pfx-inner" style="--accent:#06b6d4;--bg:#060d10;--term:#040a0d;--rot:-6deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>custom</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:55%"></s><s style="width:70%;background:var(--accent)"></s></div></div></div>
+    <div class="pfx pfx-sm" data-speed="0.25" style="left:88%;top:3200px"><div class="pfx-inner" style="--accent:#fb923c;--bg:#141008;--term:#100c06;--rot:4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>my-skin</span></div><div class="pfx-term" style="background:var(--term)"><s style="width:80%"></s><s style="width:45%;background:var(--accent)"></s></div></div></div>
+    <div class="pfx pfx-sm" data-speed="0.38" style="right:20%;top:4000px"><div class="pfx-inner" style="--accent:#4ade80;--bg:#0a120a;--term:#080e08;--rot:-4deg"><div class="pfx-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>phosphor-2</span></div><div class="pfx-term" style="background:var(--term)"><s style="background:var(--accent)"></s><s style="width:55%"></s></div></div></div>
   </div>
 
   <main id="main-content">
@@ -60,10 +48,13 @@ import Footer from '../components/Footer.astro';
 
   <style is:global>
     .parallax-bg {
-      position: fixed;
-      inset: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
       pointer-events: none;
-      z-index: 10;
+      z-index: 0;
       overflow: hidden;
     }
 
@@ -72,18 +63,18 @@ import Footer from '../components/Footer.astro';
     .pfx {
       position: absolute;
       width: 140px;
-      opacity: 0.5;
+      opacity: 0.45;
       will-change: transform;
     }
 
     .pfx-lg {
-      width: 190px;
-      opacity: 0.3;
+      width: 180px;
+      opacity: 0.25;
     }
 
     .pfx-sm {
-      width: 105px;
-      opacity: 0.6;
+      width: 100px;
+      opacity: 0.55;
     }
 
     .pfx-inner {
@@ -151,34 +142,14 @@ import Footer from '../components/Footer.astro';
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (pfxEls.length > 0 && !prefersReduced) {
-      // Store each terminal's original document-space top position
-      const items = Array.from(pfxEls).map(el => {
-        const top = parseInt(el.style.top) || 0;
-        const speed = parseFloat(el.dataset.speed || '0.1');
-        // Clear inline top since we're using fixed positioning now
-        el.style.top = '0';
-        return { el, docTop: top, speed };
-      });
-
       let ticking = false;
 
       function updateParallax() {
         const scrollY = window.scrollY;
-        const vh = window.innerHeight;
-
-        items.forEach(({ el, docTop, speed }) => {
-          // Where this terminal would be in the viewport with parallax
-          // Normal scroll: viewportY = docTop - scrollY
-          // Parallax: it moves slower, so viewportY = docTop - scrollY * (1 - speed)
-          const viewportY = docTop - scrollY * (1 - speed);
-
-          // Only show if roughly in viewport range (with generous buffer)
-          if (viewportY > -200 && viewportY < vh + 200) {
-            el.style.transform = `translateY(${viewportY}px)`;
-            el.style.visibility = 'visible';
-          } else {
-            el.style.visibility = 'hidden';
-          }
+        pfxEls.forEach(el => {
+          const speed = parseFloat(el.dataset.speed || '0.1');
+          const y = -scrollY * speed;
+          el.style.transform = `translateY(${y}px)`;
         });
         ticking = false;
       }
