@@ -74,11 +74,8 @@ import Footer from '../components/Footer.astro';
 
   <style is:global>
     .parallax-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
+      position: fixed;
+      inset: 0;
       pointer-events: none;
       z-index: 10;
       overflow: hidden;
@@ -168,14 +165,34 @@ import Footer from '../components/Footer.astro';
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (pfxEls.length > 0 && !prefersReduced) {
+      // Store each terminal's original document-space top position
+      const items = Array.from(pfxEls).map(el => {
+        const top = parseInt(el.style.top) || 0;
+        const speed = parseFloat(el.dataset.speed || '0.1');
+        // Clear inline top since we're using fixed positioning now
+        el.style.top = '0';
+        return { el, docTop: top, speed };
+      });
+
       let ticking = false;
 
       function updateParallax() {
         const scrollY = window.scrollY;
-        pfxEls.forEach(el => {
-          const speed = parseFloat(el.dataset.speed || '0.1');
-          const y = -scrollY * speed;
-          el.style.transform = `translateY(${y}px)`;
+        const vh = window.innerHeight;
+
+        items.forEach(({ el, docTop, speed }) => {
+          // Where this terminal would be in the viewport with parallax
+          // Normal scroll: viewportY = docTop - scrollY
+          // Parallax: it moves slower, so viewportY = docTop - scrollY * (1 - speed)
+          const viewportY = docTop - scrollY * (1 - speed);
+
+          // Only show if roughly in viewport range (with generous buffer)
+          if (viewportY > -200 && viewportY < vh + 200) {
+            el.style.transform = `translateY(${viewportY}px)`;
+            el.style.visibility = 'visible';
+          } else {
+            el.style.visibility = 'hidden';
+          }
         });
         ticking = false;
       }
