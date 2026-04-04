@@ -72,6 +72,24 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     .bind(user.id)
     .run();
 
+  // Enforce max 3 concurrent sessions — boot oldest if at limit
+  const sessionCount = await DB.prepare(
+    `SELECT COUNT(*) as c FROM sessions WHERE user_id = ? AND expires_at > datetime('now')`,
+  )
+    .bind(user.id)
+    .first<{ c: number }>();
+
+  if ((sessionCount?.c ?? 0) >= 3) {
+    await DB.prepare(
+      `DELETE FROM sessions WHERE id = (
+        SELECT id FROM sessions WHERE user_id = ?
+        ORDER BY created_at ASC LIMIT 1
+      )`,
+    )
+      .bind(user.id)
+      .run();
+  }
+
   // Create new session (90 days)
   const sessionId = generateSessionId();
   const ip = context.request.headers.get('CF-Connecting-IP') ?? '';
