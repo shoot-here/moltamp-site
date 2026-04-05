@@ -164,7 +164,7 @@ export function supportAutoReplyHtml(): string {
     </table>
 
     <p style="font-family:${BRAND.sans}; font-size:13px; color:${BRAND.textSecondary}; margin:0; line-height:1.6;">
-      &mdash; The MOLTamp Team
+      &mdash; MOLTamp
     </p>
   `);
 }

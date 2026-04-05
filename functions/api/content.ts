@@ -18,7 +18,7 @@ const DEFAULTS = {
     { headline: "MOLTamp is worth it.", body: "You've been using every feature for free. The only thing $20 buys is never seeing this again.", cta: "Pay once, nag never" },
     { headline: "Support indie software.", body: "MOLTamp is self-funded and built with love. $20 keeps the lights on and kills this popup.", cta: "Back the project — $20" },
     { headline: "No VC. No ads. Just vibes.", body: "MOLTamp is self-funded, open-source friendly, and community-driven. This popup is how it stays that way.", cta: "Support the craft — $20" },
-    { headline: "Small team. Big vibes. One ask.", body: "No investors, no recurring fees. Just a small team that made something cool and is asking for a coffee-and-a-half.", cta: "Buy the team a coffee+ — $20" },
+    { headline: "One dev. Big vibes. One ask.", body: "No investors, no recurring fees. Just an indie dev who made something cool and is asking for a coffee-and-a-half.", cta: "Buy the dev a coffee+ — $20" },
     { headline: "This popup is the product.", body: "Everything else is free. The skins, the panels, the terminal — all yours. You're just paying to make this go away.", cta: "$20 to never see this again" },
     { headline: "Quick math.", body: "You've spent more time dismissing this popup than it takes to buy a license. Just saying.", cta: "Fine, take my $20" },
     { headline: "We meet again.", body: "You know how this ends. You wait, you dismiss, you forget, and I come back. Break the cycle.", cta: "End the loop — $20" },
