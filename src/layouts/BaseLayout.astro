@@ -4,11 +4,15 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  keywords?: string;
+  canonical?: string;
 }
 
 const {
   title = 'MOLTamp — Skinnable Shell for AI Terminals',
   description = 'The cockpit UI for your AI terminal. Skins, panels, widgets, music — wraps Claude Code, Codex CLI, Gemini CLI, and Aider in a fully customizable shell. Free forever, $20 to unlock.',
+  keywords = 'moltamp, ai terminal, claude code, codex cli, gemini cli, aider, terminal skins, vibe coding, terminal ui, terminal themes, ai coding tools, skinnable terminal',
+  canonical,
 } = Astro.props;
 ---
 
@@ -18,7 +22,9 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
     <meta name="theme-color" content="#08080a" />
+    {canonical && <link rel="canonical" href={canonical} />}
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />

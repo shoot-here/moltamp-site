@@ -1,0 +1,254 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const releases = [
+  {
+    version: '2.7.0',
+    date: 'April 2026',
+    tag: 'Latest',
+    features: [
+      'Skin and layout decoupling — save layouts independently from skins',
+      'Layout save slots — store and cycle between multiple panel arrangements',
+      'Status bar layout cycling with dirty detection',
+      'Ticker expansion — clickable items that open in browser',
+      'Scroll-pause on hover for ticker feeds',
+      'Admin panel for server-managed content',
+      'Branded email templates for license delivery',
+      'Support auto-responder for inbound emails',
+    ],
+  },
+  {
+    version: '2.5.0',
+    date: 'April 2026',
+    features: [
+      'Custom widget SDK — build your own widgets with the authoring guide',
+      'Widget import and export system',
+      'About tab with clickable links to website and GitHub repos',
+      'Opt-in update checker in Settings',
+      'Share button for quick skin/layout sharing',
+    ],
+  },
+  {
+    version: '2.3.0',
+    date: 'April 2026',
+    features: [
+      'Skin v3 architecture — color overrides and effect toggles',
+      'Skin customization panel — tweak any skin without editing CSS',
+      'Save Skin As — fork and customize community skins',
+      'Skin list view in browser',
+      'Skin cycling arrows in status bar',
+      'Apple Notes widget',
+      'Session-only timers',
+      'Multi-timer widget',
+    ],
+  },
+  {
+    version: '2.0.0',
+    date: 'April 2026',
+    features: [
+      'New content architecture — ~/Moltamp/ as single source of truth',
+      'Git panel — branch, changed files, and recent commits at a glance',
+      'Calendar widget with session history',
+      'Multi-feed ticker deck with resizable slots',
+      'Local MP3 player with equalizer',
+      'Full layout preview in skin hero card',
+      'DMG packaging for macOS distribution',
+      'Server-authoritative licensing with Ed25519 signing',
+    ],
+  },
+  {
+    version: '1.5.0',
+    date: 'March 2026',
+    features: [
+      'Media tab — visualizer, equalizer, now playing display',
+      'Collapsible widgets with drag-and-drop reordering',
+      'Live2D bongo cat companion with character pack system',
+      'Widget developer guide',
+      'Clock settings with world clock support',
+      'Weather widget with 3-day forecast toggle',
+      'System monitor — CPU, memory, load averages',
+      'Separate settings window',
+    ],
+  },
+  {
+    version: '1.0.0',
+    date: 'March 2026',
+    features: [
+      'Real audio visualizer — bars, waveform, and circular modes',
+      'Visualizer shows audio source detection (system or microphone)',
+      'Obsidian vault tab — file browser with force-directed graph view',
+      'Inline note editor for vault files',
+    ],
+  },
+  {
+    version: '0.1.0',
+    date: 'March 2026',
+    tag: 'Initial Release',
+    features: [
+      'Skinnable terminal shell for Claude Code and other AI CLI agents',
+      'Full skin system — CSS variables, JSON manifests, asset support',
+      'Resizable panels — left, right, bottom, top (vibes bar)',
+      'Built-in music controls for Spotify and Apple Music',
+      'Real-time telemetry — model, context %, tokens, cost',
+      'Hook event stream — tool calls, permissions, errors',
+      'Session management with nicknames and background mode',
+      'Mini mode (Cmd+M) — strip all chrome, just terminal',
+      'Keyboard shortcuts — Cmd+Arrow to toggle panels, Cmd+K for shortcut list',
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Changelog — MOLTamp"
+  description="What's new in MOLTamp. Release history, new features, and updates for the skinnable AI terminal shell."
+  keywords="moltamp changelog, moltamp updates, moltamp releases, moltamp new features, ai terminal updates"
+>
+  <Nav />
+  <main class="changelog-page">
+    <div class="container">
+      <div class="changelog-hero fade-in">
+        <span class="badge">Changelog</span>
+        <h1>What's New</h1>
+        <p>Features and updates across every release.</p>
+      </div>
+
+      <div class="releases">
+        {releases.map((r) => (
+          <div class="release fade-in">
+            <div class="release-header">
+              <div class="release-version">
+                <span class="version-number">v{r.version}</span>
+                {r.tag && <span class={`version-tag ${r.tag === 'Latest' ? 'tag-latest' : 'tag-initial'}`}>{r.tag}</span>}
+              </div>
+              <span class="release-date">{r.date}</span>
+            </div>
+            <ul class="release-features">
+              {r.features.map((f) => (
+                <li>{f}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .changelog-page {
+    padding: calc(var(--nav-height) + 40px) 0 80px;
+  }
+
+  .changelog-hero {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .changelog-hero h1 {
+    font-size: 2.4rem;
+    margin: 16px 0 12px;
+  }
+
+  .changelog-hero p {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+  }
+
+  .releases {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .release {
+    position: relative;
+    padding: 32px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .release:last-child {
+    border-bottom: none;
+  }
+
+  .release-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .release-version {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .version-number {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .version-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .tag-latest {
+    background: var(--accent-subtle);
+    color: var(--accent);
+    border: 1px solid var(--accent-glow);
+  }
+
+  .tag-initial {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .release-date {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+  }
+
+  .release-features {
+    list-style: none;
+    padding: 0;
+  }
+
+  .release-features li {
+    position: relative;
+    padding: 6px 0 6px 20px;
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .release-features li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  @media (max-width: 520px) {
+    .release-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+  }
+</style>

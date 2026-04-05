@@ -1,0 +1,512 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Admin — MOLTamp">
+  <main class="admin-page">
+    <!-- Login gate -->
+    <div id="login-gate" style="max-width: 360px; margin: 120px auto; text-align: center;">
+      <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">Admin</h1>
+      <input type="password" id="admin-secret" placeholder="Admin secret"
+        style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 14px; margin-bottom: 12px; box-sizing: border-box;" />
+      <button id="login-btn" style="width: 100%; padding: 10px; border-radius: 8px; background: #007aff; color: #fff; border: none; cursor: pointer; font-size: 14px; font-weight: 600;">Sign In</button>
+      <p id="login-error" style="color: #ff4444; font-size: 12px; margin-top: 8px; display: none;"></p>
+    </div>
+
+    <!-- Admin panel (hidden until auth) -->
+    <div id="admin-panel" style="display: none; max-width: 800px; margin: 40px auto; padding: 0 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+        <h1 style="font-size: 24px; font-weight: 700;">MOLTamp Admin</h1>
+        <span id="last-saved" style="font-size: 12px; color: #666;"></span>
+      </div>
+
+      <!-- Tabs -->
+      <div id="admin-tabs" style="display: flex; gap: 2px; margin-bottom: 24px; border-bottom: 1px solid #333;">
+        <button class="tab-btn active" data-tab="content">Content</button>
+        <button class="tab-btn" data-tab="licenses">Licenses</button>
+        <button class="tab-btn" data-tab="version">Version</button>
+        <button class="tab-btn" data-tab="advanced">Advanced</button>
+      </div>
+
+      <!-- Content Tab -->
+      <div id="tab-content" class="tab-panel">
+        <section class="admin-section">
+          <div class="section-header">
+            <h2>Nag Messages</h2>
+            <button class="btn-sm" id="add-nag">+ Add</button>
+          </div>
+          <p class="hint">Shown to unlicensed users. Server controls all copy and pricing.</p>
+          <div id="nag-list"></div>
+        </section>
+
+        <section class="admin-section">
+          <h2>Nag Timing</h2>
+          <div class="field-row">
+            <label>Min interval (minutes)<input type="number" id="nag-interval-min" min="1" /></label>
+            <label>Max interval (minutes)<input type="number" id="nag-interval-max" min="1" /></label>
+            <label>Dismiss delay (seconds)<input type="number" id="nag-dismiss-delay" min="0" /></label>
+          </div>
+        </section>
+
+        <section class="admin-section">
+          <div class="section-header">
+            <h2>Notifications</h2>
+            <button class="btn-sm" id="add-notif">+ Add</button>
+          </div>
+          <p class="hint">One-time dismissible messages. Set an expiry date or leave blank for permanent.</p>
+          <div id="notif-list"></div>
+        </section>
+
+        <section class="admin-section">
+          <div class="section-header">
+            <h2>What's New</h2>
+            <button class="btn-sm" id="add-whatsnew">+ Add</button>
+          </div>
+          <div id="whatsnew-list"></div>
+        </section>
+
+        <button class="btn-primary" id="save-content">Save Content</button>
+      </div>
+
+      <!-- Licenses Tab -->
+      <div id="tab-licenses" class="tab-panel" style="display: none;">
+        <section class="admin-section">
+          <h2>Licenses</h2>
+          <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <input type="text" id="license-search" placeholder="Search by email or key..." style="flex: 1;" />
+            <button class="btn-sm" id="license-search-btn">Search</button>
+          </div>
+          <div id="license-count" style="font-size: 12px; color: #666; margin-bottom: 12px;"></div>
+          <table id="license-table">
+            <thead>
+              <tr><th>Email</th><th>Key</th><th>Created</th><th>Last Validated</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="license-tbody"></tbody>
+          </table>
+          <div id="license-pagination" style="display: flex; gap: 8px; margin-top: 12px;"></div>
+        </section>
+      </div>
+
+      <!-- Version Tab -->
+      <div id="tab-version" class="tab-panel" style="display: none;">
+        <section class="admin-section">
+          <h2>Update Prompt</h2>
+          <p class="hint">Shown when a newer version is available.</p>
+          <div class="field-row">
+            <label>Latest version<input type="text" id="update-latest" placeholder="1.0.0" /></label>
+            <label>Download URL<input type="text" id="update-url" placeholder="https://moltamp.com/download" /></label>
+          </div>
+          <label>Release notes<textarea id="update-notes" rows="2" placeholder="What's new in this version..."></textarea></label>
+        </section>
+
+        <section class="admin-section">
+          <h2>Minimum Recommended Version</h2>
+          <p class="hint">Soft nudge — never blocks the app. Users can dismiss.</p>
+          <div class="field-row">
+            <label>Min version<input type="text" id="min-version" placeholder="1.0.0 (blank = no nudge)" /></label>
+          </div>
+          <label>Upgrade message<textarea id="upgrade-message" rows="2" placeholder="Custom message (optional)"></textarea></label>
+          <label>Upgrade URL<input type="text" id="upgrade-url" placeholder="https://moltamp.com/download" /></label>
+        </section>
+
+        <button class="btn-primary" id="save-version">Save Version Config</button>
+      </div>
+
+      <!-- Advanced Tab -->
+      <div id="tab-advanced" class="tab-panel" style="display: none;">
+        <section class="admin-section">
+          <h2>Domain Migration</h2>
+          <p class="hint">Redirect all running apps to new API URLs. Persists to their config.json.</p>
+          <label>Content API redirect<input type="text" id="redirect-content" placeholder="https://new-api.moltamp.com/content" /></label>
+          <label>Version check redirect<input type="text" id="redirect-version" placeholder="https://new-api.moltamp.com/version.json" /></label>
+        </section>
+
+        <section class="admin-section">
+          <h2>Raw JSON</h2>
+          <p class="hint">Full content blob. Edit directly if needed.</p>
+          <textarea id="raw-json" rows="12" style="font-family: monospace; font-size: 12px;"></textarea>
+        </section>
+
+        <button class="btn-primary" id="save-advanced">Save Advanced</button>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .admin-page {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #e0e0e0;
+      background: #0d0d0d;
+      min-height: 100vh;
+    }
+    .admin-section { margin-bottom: 32px; }
+    .admin-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; }
+    .hint { font-size: 12px; color: #666; margin-bottom: 12px; }
+    .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .field-row label { flex: 1; min-width: 140px; }
+    label { display: block; font-size: 12px; color: #888; margin-bottom: 10px; }
+    input[type="text"], input[type="number"], input[type="password"], textarea, select {
+      display: block; width: 100%; margin-top: 4px; padding: 8px 10px;
+      border-radius: 6px; border: 1px solid #333; background: #1a1a1a;
+      color: #e0e0e0; font-size: 13px; font-family: inherit; box-sizing: border-box;
+    }
+    textarea { resize: vertical; }
+    input:focus, textarea:focus { outline: none; border-color: #007aff; }
+    .btn-primary {
+      padding: 10px 20px; border-radius: 8px; background: #007aff; color: #fff;
+      border: none; cursor: pointer; font-size: 14px; font-weight: 600;
+    }
+    .btn-primary:hover { background: #0066dd; }
+    .btn-sm {
+      padding: 5px 12px; border-radius: 6px; background: #252525; color: #ccc;
+      border: 1px solid #333; cursor: pointer; font-size: 12px;
+    }
+    .btn-sm:hover { background: #333; }
+    .tab-btn {
+      padding: 8px 16px; background: none; border: none; color: #666;
+      cursor: pointer; font-size: 13px; border-bottom: 2px solid transparent;
+    }
+    .tab-btn.active { color: #fff; border-bottom-color: #007aff; }
+    .tab-btn:hover { color: #aaa; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; padding: 8px 6px; border-bottom: 1px solid #333; color: #888; font-weight: 500; }
+    td { padding: 8px 6px; border-bottom: 1px solid #1a1a1a; }
+    .nag-card, .notif-card, .whatsnew-card {
+      background: #151515; border: 1px solid #252525; border-radius: 8px;
+      padding: 12px; margin-bottom: 8px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .card-header .card-num { font-size: 10px; color: #555; }
+    .card-remove { cursor: pointer; color: #555; font-size: 14px; }
+    .card-remove:hover { color: #ff4444; }
+    .action-btn {
+      padding: 3px 8px; border-radius: 4px; background: #252525; color: #aaa;
+      border: 1px solid #333; cursor: pointer; font-size: 11px;
+    }
+    .action-btn:hover { background: #333; color: #fff; }
+    .action-btn.danger { color: #ff6b6b; }
+    .action-btn.danger:hover { background: #3a1a1a; }
+    .status-active { color: #4ade80; }
+    .status-revoked { color: #ff6b6b; }
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
+      border-radius: 8px; background: #1a1a1a; border: 1px solid #333;
+      color: #e0e0e0; font-size: 13px; z-index: 9999;
+      animation: fadeIn 0.2s ease;
+    }
+    .toast.success { border-color: #4ade80; }
+    .toast.error { border-color: #ff4444; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } }
+  </style>
+
+  <script is:inline>
+    let SECRET = "";
+    let contentData = {};
+
+    // ── Auth ──────────────────────────────────────────────────────────────
+
+    const loginBtn = document.getElementById("login-btn");
+    const secretInput = document.getElementById("admin-secret");
+    const loginError = document.getElementById("login-error");
+
+    loginBtn.addEventListener("click", doLogin);
+    secretInput.addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
+
+    async function doLogin() {
+      SECRET = secretInput.value.trim();
+      if (!SECRET) return;
+      try {
+        const res = await apiFetch("/api/admin/content");
+        if (!res.ok) throw new Error("Invalid secret");
+        const data = await res.json();
+        contentData = data.content || {};
+        document.getElementById("login-gate").style.display = "none";
+        document.getElementById("admin-panel").style.display = "block";
+        if (data.updated_at) {
+          document.getElementById("last-saved").textContent = `Last saved: ${new Date(data.updated_at + "Z").toLocaleString()}`;
+        }
+        populateUI();
+        loadLicenses();
+      } catch {
+        loginError.textContent = "Invalid admin secret";
+        loginError.style.display = "block";
+      }
+    }
+
+    function apiFetch(url, opts = {}) {
+      return fetch(url, {
+        ...opts,
+        headers: { ...opts.headers, Authorization: `Bearer ${SECRET}`, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Tabs ──────────────────────────────────────────────────────────────
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach((p) => p.style.display = "none");
+        btn.classList.add("active");
+        document.getElementById(`tab-${btn.dataset.tab}`).style.display = "block";
+      });
+    });
+
+    // ── Populate UI from contentData ──────────────────────────────────────
+
+    function populateUI() {
+      // Nag messages
+      renderNagList();
+      // Nag config
+      document.getElementById("nag-interval-min").value = contentData.nag_config?.interval_min ?? 15;
+      document.getElementById("nag-interval-max").value = contentData.nag_config?.interval_max ?? 20;
+      document.getElementById("nag-dismiss-delay").value = contentData.nag_config?.dismiss_delay ?? 7;
+      // Notifications
+      renderNotifList();
+      // What's new
+      renderWhatsNewList();
+      // Version
+      document.getElementById("update-latest").value = contentData.update?.latest ?? "";
+      document.getElementById("update-url").value = contentData.update?.url ?? "";
+      document.getElementById("update-notes").value = contentData.update?.notes ?? "";
+      document.getElementById("min-version").value = contentData.min_version ?? "";
+      document.getElementById("upgrade-message").value = contentData.upgrade_message ?? "";
+      document.getElementById("upgrade-url").value = contentData.upgrade_url ?? "";
+      // Advanced
+      document.getElementById("redirect-content").value = contentData.redirect_content_url ?? "";
+      document.getElementById("redirect-version").value = contentData.redirect_version_url ?? "";
+      document.getElementById("raw-json").value = JSON.stringify(contentData, null, 2);
+    }
+
+    // ── Nag Messages ──────────────────────────────────────────────────────
+
+    function renderNagList() {
+      const list = document.getElementById("nag-list");
+      const msgs = contentData.nag_messages || [];
+      list.innerHTML = msgs.map((m, i) => `
+        <div class="nag-card" data-index="${i}">
+          <div class="card-header"><span class="card-num">#${i + 1}</span><span class="card-remove" onclick="removeNag(${i})">&times;</span></div>
+          <input type="text" value="${esc(m.headline)}" placeholder="Headline" onchange="updateNag(${i}, 'headline', this.value)" />
+          <textarea rows="2" onchange="updateNag(${i}, 'body', this.value)" placeholder="Body">${esc(m.body)}</textarea>
+          <input type="text" value="${esc(m.cta)}" placeholder="CTA button text" onchange="updateNag(${i}, 'cta', this.value)" />
+        </div>
+      `).join("");
+    }
+
+    window.updateNag = (i, field, val) => {
+      if (!contentData.nag_messages) contentData.nag_messages = [];
+      contentData.nag_messages[i][field] = val;
+    };
+    window.removeNag = (i) => {
+      contentData.nag_messages.splice(i, 1);
+      renderNagList();
+    };
+    document.getElementById("add-nag").addEventListener("click", () => {
+      if (!contentData.nag_messages) contentData.nag_messages = [];
+      contentData.nag_messages.push({ headline: "", body: "", cta: "" });
+      renderNagList();
+    });
+
+    // ── Notifications ──────────────────────────────────────────────────────
+
+    function renderNotifList() {
+      const list = document.getElementById("notif-list");
+      const notifs = contentData.notifications || [];
+      list.innerHTML = notifs.map((n, i) => `
+        <div class="notif-card" data-index="${i}">
+          <div class="card-header"><span class="card-num">${n.id || "new"}</span><span class="card-remove" onclick="removeNotif(${i})">&times;</span></div>
+          <div class="field-row">
+            <label>ID<input type="text" value="${esc(n.id || "")}" onchange="updateNotif(${i}, 'id', this.value)" /></label>
+            <label>Type<select onchange="updateNotif(${i}, 'type', this.value)">
+              <option value="info" ${n.type === "info" ? "selected" : ""}>Info</option>
+              <option value="warning" ${n.type === "warning" ? "selected" : ""}>Warning</option>
+              <option value="success" ${n.type === "success" ? "selected" : ""}>Success</option>
+            </select></label>
+            <label>Expires<input type="date" value="${n.expires ? n.expires.split("T")[0] : ""}" onchange="updateNotif(${i}, 'expires', this.value)" /></label>
+          </div>
+          <label>Message<textarea rows="2" onchange="updateNotif(${i}, 'message', this.value)">${esc(n.message || "")}</textarea></label>
+          <label>URL (optional)<input type="text" value="${esc(n.url || "")}" onchange="updateNotif(${i}, 'url', this.value)" /></label>
+        </div>
+      `).join("");
+    }
+
+    window.updateNotif = (i, field, val) => {
+      contentData.notifications[i][field] = val;
+    };
+    window.removeNotif = (i) => {
+      contentData.notifications.splice(i, 1);
+      renderNotifList();
+    };
+    document.getElementById("add-notif").addEventListener("click", () => {
+      if (!contentData.notifications) contentData.notifications = [];
+      contentData.notifications.push({ id: `notif-${Date.now()}`, type: "info", message: "" });
+      renderNotifList();
+    });
+
+    // ── What's New ──────────────────────────────────────────────────────
+
+    function renderWhatsNewList() {
+      const list = document.getElementById("whatsnew-list");
+      const items = contentData.whats_new || [];
+      list.innerHTML = items.map((w, i) => `
+        <div class="whatsnew-card" data-index="${i}">
+          <div class="card-header"><span class="card-num">v${esc(w.version || "")}</span><span class="card-remove" onclick="removeWhatsNew(${i})">&times;</span></div>
+          <div class="field-row">
+            <label>Version<input type="text" value="${esc(w.version || "")}" onchange="updateWhatsNew(${i}, 'version', this.value)" /></label>
+            <label>Date<input type="date" value="${esc(w.date || "")}" onchange="updateWhatsNew(${i}, 'date', this.value)" /></label>
+          </div>
+          <label>Highlights (one per line)<textarea rows="4" onchange="updateWhatsNew(${i}, 'highlights', this.value.split('\\n').filter(Boolean))">${(w.highlights || []).join("\\n")}</textarea></label>
+        </div>
+      `).join("");
+    }
+
+    window.updateWhatsNew = (i, field, val) => {
+      contentData.whats_new[i][field] = val;
+    };
+    window.removeWhatsNew = (i) => {
+      contentData.whats_new.splice(i, 1);
+      renderWhatsNewList();
+    };
+    document.getElementById("add-whatsnew").addEventListener("click", () => {
+      if (!contentData.whats_new) contentData.whats_new = [];
+      contentData.whats_new.unshift({ version: "", date: new Date().toISOString().split("T")[0], highlights: [] });
+      renderWhatsNewList();
+    });
+
+    // ── Save ──────────────────────────────────────────────────────────────
+
+    async function saveContent() {
+      // Collect nag config from inputs
+      contentData.nag_config = {
+        interval_min: parseInt(document.getElementById("nag-interval-min").value) || 15,
+        interval_max: parseInt(document.getElementById("nag-interval-max").value) || 20,
+        dismiss_delay: parseInt(document.getElementById("nag-dismiss-delay").value) || 7,
+      };
+      await doSave();
+    }
+
+    async function saveVersion() {
+      const latest = document.getElementById("update-latest").value.trim();
+      if (latest) {
+        contentData.update = {
+          latest,
+          notes: document.getElementById("update-notes").value.trim(),
+          url: document.getElementById("update-url").value.trim() || "https://moltamp.com/download",
+        };
+      }
+      const mv = document.getElementById("min-version").value.trim();
+      contentData.min_version = mv || undefined;
+      contentData.upgrade_message = document.getElementById("upgrade-message").value.trim() || undefined;
+      contentData.upgrade_url = document.getElementById("upgrade-url").value.trim() || undefined;
+      await doSave();
+    }
+
+    async function saveAdvanced() {
+      const rc = document.getElementById("redirect-content").value.trim();
+      const rv = document.getElementById("redirect-version").value.trim();
+      contentData.redirect_content_url = rc || undefined;
+      contentData.redirect_version_url = rv || undefined;
+
+      // Try parsing raw JSON if it was edited
+      try {
+        const raw = JSON.parse(document.getElementById("raw-json").value);
+        contentData = raw;
+      } catch { /* keep existing if invalid */ }
+
+      await doSave();
+    }
+
+    async function doSave() {
+      // Clean undefined values
+      const clean = JSON.parse(JSON.stringify(contentData));
+      try {
+        const res = await apiFetch("/api/admin/content", {
+          method: "PUT",
+          body: JSON.stringify({ content: clean }),
+        });
+        if (!res.ok) throw new Error("Save failed");
+        toast("Saved", "success");
+        document.getElementById("last-saved").textContent = `Last saved: ${new Date().toLocaleString()}`;
+        document.getElementById("raw-json").value = JSON.stringify(clean, null, 2);
+      } catch (e) {
+        toast("Save failed: " + e.message, "error");
+      }
+    }
+
+    document.getElementById("save-content").addEventListener("click", saveContent);
+    document.getElementById("save-version").addEventListener("click", saveVersion);
+    document.getElementById("save-advanced").addEventListener("click", saveAdvanced);
+
+    // ── Licenses ──────────────────────────────────────────────────────────
+
+    let licenseOffset = 0;
+
+    async function loadLicenses(q = "") {
+      const search = q || document.getElementById("license-search").value.trim();
+      const res = await apiFetch(`/api/admin/licenses?q=${encodeURIComponent(search)}&limit=20&offset=${licenseOffset}`);
+      const data = await res.json();
+      document.getElementById("license-count").textContent = `${data.total} license${data.total !== 1 ? "s" : ""}`;
+
+      const tbody = document.getElementById("license-tbody");
+      tbody.innerHTML = data.licenses.map((l) => `
+        <tr>
+          <td>${esc(l.email)}</td>
+          <td style="font-family: monospace; font-size: 11px;">${esc(l.license_key)}</td>
+          <td>${shortDate(l.created_at)}</td>
+          <td>${l.last_validated_at ? shortDate(l.last_validated_at) : "—"}</td>
+          <td class="${l.revoked_at ? "status-revoked" : "status-active"}">${l.revoked_at ? "Revoked" : "Active"}</td>
+          <td>
+            <button class="action-btn" onclick="resendLicense(${l.id})">Resend</button>
+            ${l.revoked_at
+              ? `<button class="action-btn" onclick="licenseAction(${l.id}, 'unrevoke')">Restore</button>`
+              : `<button class="action-btn danger" onclick="licenseAction(${l.id}, 'revoke')">Revoke</button>`
+            }
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    document.getElementById("license-search-btn").addEventListener("click", () => { licenseOffset = 0; loadLicenses(); });
+    document.getElementById("license-search").addEventListener("keydown", (e) => { if (e.key === "Enter") { licenseOffset = 0; loadLicenses(); } });
+
+    window.resendLicense = async (id) => {
+      if (!confirm("Resend license email?")) return;
+      try {
+        const res = await apiFetch("/api/admin/licenses", {
+          method: "POST",
+          body: JSON.stringify({ action: "resend", license_id: id }),
+        });
+        const data = await res.json();
+        if (data.ok) toast(data.message, "success");
+        else toast(data.error, "error");
+      } catch (e) { toast(e.message, "error"); }
+    };
+
+    window.licenseAction = async (id, action) => {
+      const verb = action === "revoke" ? "Revoke this license?" : "Restore this license?";
+      if (!confirm(verb)) return;
+      try {
+        const res = await apiFetch("/api/admin/licenses", {
+          method: "POST",
+          body: JSON.stringify({ action, license_id: id }),
+        });
+        const data = await res.json();
+        if (data.ok) { toast(data.message, "success"); loadLicenses(); }
+        else toast(data.error, "error");
+      } catch (e) { toast(e.message, "error"); }
+    };
+
+    // ── Helpers ──────────────────────────────────────────────────────────
+
+    function esc(s) { return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+    function shortDate(d) { if (!d) return "—"; return new Date(d + (d.includes("Z") ? "" : "Z")).toLocaleDateString(); }
+
+    function toast(msg, type = "info") {
+      const el = document.createElement("div");
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+  </script>
+</BaseLayout>
