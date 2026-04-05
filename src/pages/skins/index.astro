@@ -11,7 +11,7 @@ import Footer from '../../components/Footer.astro';
 >
   <Nav />
   <main id="main-content" class="gallery-page">
-    <!-- Hero header -->
+    <!-- Hero -->
     <div class="gallery-hero">
       <div class="gallery-hero-bg" aria-hidden="true">
         <div class="hero-glow"></div>
@@ -19,33 +19,36 @@ import Footer from '../../components/Footer.astro';
       </div>
       <div class="container">
         <div class="gallery-header">
-          <h1 class="gallery-title">Skin<br/>Gallery</h1>
-          <p class="gallery-desc">Community-built skins for MOLTamp. Browse, download, rate — or upload your own.</p>
+          <h1 class="gallery-title">Skins</h1>
+          <p class="gallery-desc">Community-built themes for MOLTamp. Browse, download, and make it yours.</p>
         </div>
 
-        <!-- Trending row -->
-        <div class="trending-section" id="trending-section">
-          <div class="trending-label">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            <span>Trending</span>
+        <!-- Featured (always visible, graceful empty) -->
+        <div class="featured-section" id="featured-section">
+          <div class="section-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Featured</span>
           </div>
-          <div class="trending-row" id="trending-row"></div>
+          <div class="featured-row" id="featured-row">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Gallery body -->
     <div class="container gallery-body">
-      <!-- Search + filters -->
+      <!-- Filters -->
       <div class="filter-bar">
-        <div class="search-field">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="text" id="search-input" placeholder="Search skins..." />
-        </div>
-        <div class="filter-row">
-          <div class="tag-scroll" id="tag-chips"></div>
+        <div class="filter-top">
+          <div class="search-field">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search skins..." />
+          </div>
           <select id="sort-select" class="sort-pill">
             <option value="newest">Newest</option>
             <option value="popular">Most Downloaded</option>
@@ -53,17 +56,36 @@ import Footer from '../../components/Footer.astro';
             <option value="updated">Recently Updated</option>
           </select>
         </div>
+        <div class="tag-scroll" id="tag-chips"></div>
       </div>
 
-      <!-- Grid -->
-      <div class="skins-grid" id="skins-grid"></div>
+      <!-- Grid with skeleton loader -->
+      <div class="skins-grid" id="skins-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+
       <div class="pagination" id="pagination"></div>
+
       <div class="empty-state" id="empty-state" style="display:none;">
-        <div class="empty-icon" aria-hidden="true">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        <div class="empty-visual" aria-hidden="true">
+          <div class="empty-terminal">
+            <div class="et-bar"><span></span><span></span><span></span></div>
+            <div class="et-body">
+              <div class="et-line"></div>
+              <div class="et-line short"></div>
+              <div class="et-cursor"></div>
+            </div>
+          </div>
         </div>
-        <p>No skins match your search.</p>
-        <p class="empty-sub">Try different keywords or <a href="/dashboard">upload one</a>.</p>
+        <p class="empty-title">No skins found</p>
+        <p class="empty-sub">Try a different search, or <a href="/dashboard">create one</a>.</p>
       </div>
 
       <!-- CTA -->
@@ -86,6 +108,7 @@ import Footer from '../../components/Footer.astro';
 <script>
   let currentPage = 1, currentTag = '', currentSort = 'newest';
   let searchTimeout: ReturnType<typeof setTimeout>;
+  let initialLoad = true;
 
   const grid = document.getElementById('skins-grid')!;
   const pagination = document.getElementById('pagination')!;
@@ -105,14 +128,19 @@ import Footer from '../../components/Footer.astro';
     }
   });
 
-  // Load trending skins (top 3 by rating)
+  // Load featured skins (top 3 by popularity)
   fetch('/api/skins?sort=popular&limit=3').then(r => r.json()).then(data => {
-    const row = document.getElementById('trending-row')!;
-    const section = document.getElementById('trending-section')!;
-    if (data.skins.length < 2) { section.style.display = 'none'; return; }
+    const row = document.getElementById('featured-row')!;
+    if (data.skins.length === 0) {
+      row.innerHTML = `
+        <div class="featured-empty">
+          <p>Be the first to <a href="/dashboard">upload a skin</a>.</p>
+        </div>`;
+      return;
+    }
     row.innerHTML = data.skins.map((s: any) => renderSkinCard(s)).join('');
   }).catch(() => {
-    document.getElementById('trending-section')!.style.display = 'none';
+    document.getElementById('featured-row')!.innerHTML = '';
   });
 
   // Load tags
@@ -146,11 +174,17 @@ import Footer from '../../components/Footer.astro';
   });
 
   async function loadSkins() {
+    // Show skeleton on subsequent loads (initial has server-rendered skeletons)
+    if (!initialLoad) {
+      grid.innerHTML = Array(8).fill('<div class="skeleton-card"></div>').join('');
+    }
+
     const params = new URLSearchParams({ page: String(currentPage), sort: currentSort, limit: '24' });
     if (searchInput.value.trim()) params.set('q', searchInput.value.trim());
     if (currentTag) params.set('tag', currentTag);
 
     const data = await fetch(`/api/skins?${params}`).then(r => r.json());
+    initialLoad = false;
 
     if (data.skins.length === 0) {
       grid.innerHTML = '';
@@ -219,56 +253,86 @@ import Footer from '../../components/Footer.astro';
 
   .gallery-header {
     position: relative;
-    margin-bottom: 36px;
+    margin-bottom: 40px;
   }
 
   .gallery-title {
     font-family: var(--font-heading);
     font-weight: 800;
-    font-size: clamp(2.5rem, 7vw, 4.5rem);
-    line-height: 0.95;
+    font-size: clamp(2.8rem, 7vw, 4rem);
+    line-height: 1;
     letter-spacing: -0.04em;
     background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .gallery-desc {
     color: var(--text-dim);
     font-size: 1rem;
-    max-width: 420px;
+    max-width: 400px;
     line-height: 1.6;
   }
 
-  /* ── Trending ── */
-  .trending-section {
-    margin-bottom: 32px;
-    padding-bottom: 28px;
+  /* ── Featured ── */
+  .featured-section {
+    margin-bottom: 0;
+    padding-bottom: 32px;
     border-bottom: 1px solid var(--border);
   }
 
-  .trending-label {
+  .section-label {
     display: flex;
     align-items: center;
     gap: 6px;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
-  .trending-row {
+  .featured-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 14px;
   }
 
-  .trending-row .skin-card {
+  .featured-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
     border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--border);
+  }
+
+  .featured-empty p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  .featured-empty a {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ── Skeleton loader ── */
+  .skeleton-card {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-md);
+    background: linear-gradient(110deg, rgba(255,255,255,0.03) 8%, rgba(255,255,255,0.06) 18%, rgba(255,255,255,0.03) 33%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border: 1px solid var(--border);
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   /* ── Gallery body ── */
@@ -279,19 +343,25 @@ import Footer from '../../components/Footer.astro';
 
   /* ── Filter bar ── */
   .filter-bar {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+  }
+
+  .filter-top {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
   .search-field {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 11px 16px;
+    padding: 10px 16px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
     border-radius: 10px;
-    margin-bottom: 12px;
     color: var(--text-dim);
+    flex: 1;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
@@ -311,25 +381,17 @@ import Footer from '../../components/Footer.astro';
 
   .search-field input::placeholder { color: var(--text-dim); }
 
-  .filter-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
   .tag-scroll {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    flex: 1;
   }
 
   .tag-chip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 12px;
+    padding: 5px 12px;
     font-family: var(--font-mono);
     font-size: 0.7rem;
     border-radius: 100px;
@@ -357,16 +419,16 @@ import Footer from '../../components/Footer.astro';
   .tag-chip span {
     color: var(--text-dim);
     font-size: 0.6rem;
-    opacity: 0.6;
+    opacity: 0.5;
   }
 
   .sort-pill {
-    padding: 6px 12px;
+    padding: 10px 16px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
-    border-radius: 100px;
+    border-radius: 10px;
     color: var(--text-secondary);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     cursor: pointer;
     flex-shrink: 0;
     outline: none;
@@ -380,7 +442,7 @@ import Footer from '../../components/Footer.astro';
   .skins-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 14px;
   }
 
   .skin-card {
@@ -404,7 +466,7 @@ import Footer from '../../components/Footer.astro';
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 24px 12px 8px;
+    padding: 28px 12px 10px;
     pointer-events: none;
     transition: opacity 0.2s;
     display: flex;
@@ -412,7 +474,7 @@ import Footer from '../../components/Footer.astro';
     justify-content: space-between;
   }
 
-  .skin-card-name { font-size: 0.78rem; font-weight: 600; }
+  .skin-card-name { font-size: 0.82rem; font-weight: 600; }
   .skin-card-stars { display: flex; align-items: center; gap: 1px; }
 
   .skin-card-hover {
@@ -422,18 +484,18 @@ import Footer from '../../components/Footer.astro';
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
     opacity: 0;
     transition: opacity 0.2s;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 
   .skin-card:hover .skin-card-hover { opacity: 1; }
   .skin-card:hover .skin-card-overlay { opacity: 0; }
 
-  .hover-author { font-weight: 500; }
+  .hover-author { font-weight: 500; font-size: 0.85rem; }
   .hover-stars { display: flex; align-items: center; gap: 1px; }
-  .hover-downloads { font-size: 0.65rem; }
+  .hover-downloads { font-size: 0.72rem; opacity: 0.7; }
 
   /* ── Pagination ── */
   .pagination {
@@ -488,22 +550,76 @@ import Footer from '../../components/Footer.astro';
     letter-spacing: 2px;
   }
 
-  /* ── Empty state ── */
+  /* ── Empty state (intentional design) ── */
   .empty-state {
     flex-direction: column;
     align-items: center;
-    padding: 64px 0;
+    padding: 72px 0;
     text-align: center;
+  }
+
+  .empty-visual {
+    margin-bottom: 24px;
+  }
+
+  .empty-terminal {
+    width: 120px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    opacity: 0.4;
+  }
+
+  .et-bar {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .et-bar span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-hover);
+  }
+
+  .et-body { padding: 10px 10px 14px; }
+
+  .et-line {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin-bottom: 6px;
+    width: 80%;
+  }
+
+  .et-line.short { width: 50%; }
+
+  .et-cursor {
+    width: 8px;
+    height: 10px;
+    border-radius: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+    animation: blink 1.2s step-end infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .empty-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
     color: var(--text-dim);
   }
 
-  .empty-icon {
-    margin-bottom: 16px;
-    opacity: 0.3;
-  }
-
-  .empty-state p { font-size: 0.95rem; }
-  .empty-sub { font-size: 0.85rem; margin-top: 8px; }
   .empty-sub a { color: var(--accent); }
 
   /* ── CTA ── */
@@ -550,13 +666,13 @@ import Footer from '../../components/Footer.astro';
   /* ── Responsive ── */
   @media (max-width: 1100px) {
     .skins-grid { grid-template-columns: repeat(3, 1fr); }
-    .trending-row { grid-template-columns: repeat(3, 1fr); }
   }
 
   @media (max-width: 768px) {
     .skins-grid { grid-template-columns: repeat(2, 1fr); }
-    .trending-row { grid-template-columns: repeat(2, 1fr); }
-    .trending-row .skin-card:nth-child(3) { display: none; }
+    .featured-row { grid-template-columns: repeat(2, 1fr); }
+    .featured-row .skin-card:nth-child(3) { display: none; }
+    .filter-top { flex-direction: column; }
 
     .gallery-title {
       font-size: clamp(2rem, 10vw, 3rem);
@@ -565,8 +681,8 @@ import Footer from '../../components/Footer.astro';
 
   @media (max-width: 480px) {
     .skins-grid { grid-template-columns: 1fr; }
-    .trending-row { grid-template-columns: 1fr; }
-    .trending-row .skin-card:nth-child(2),
-    .trending-row .skin-card:nth-child(3) { display: none; }
+    .featured-row { grid-template-columns: 1fr; }
+    .featured-row .skin-card:nth-child(2),
+    .featured-row .skin-card:nth-child(3) { display: none; }
   }
 </style>
